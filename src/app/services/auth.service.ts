@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
-
 import { Observable } from "rxjs";
-import { LoginRequest, LoginResponse, LogoutResponse } from "../models/Login.interface";
+
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { LoginRequest, LoginResponse } from "../models/Auth.interface";
+import { ApiResponse } from "../models/ApiResponse.interface";
 
 
 @Injectable({
@@ -12,14 +13,14 @@ import { environment } from "../../environments/environment";
 
 export class AuthService {
     constructor(private http: HttpClient) { }
-    url = environment.apiUrl;
+    url = environment.apiUrl + '/auth';
 
-    login(data: LoginRequest): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(`${this.url}/login`, { data: data });
+    login(data: LoginRequest): Observable<ApiResponse<LoginResponse>> {
+        return this.http.post<ApiResponse<LoginResponse>>(`${this.url}/login`, { data: data });
     }
 
-    logout(): Observable<LogoutResponse> {
-        return this.http.post<LogoutResponse>(`${this.url}/vouchercodes/logout`, {});
+    logout(): Observable<ApiResponse<null>> {
+        return this.http.post<ApiResponse<null>>(`${this.url}/logout`, {});
     }
 }
 
