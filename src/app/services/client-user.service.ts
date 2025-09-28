@@ -5,7 +5,7 @@ import { environment } from "../../environments/environment";
 import { ApiResponse } from "../models/ApiResponse.interface";
 import { User, UserCreateRequest } from "../models/User.interface";
 import { Employee, EmployeeCreateRequest } from "../models/Employee.interface";
-import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../models/salary.interface";
+import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../models/Salary.interface";
 import { Beneficiary, BeneficiaryCreateRequest } from "../models/Beneficiary.interface";
 import { Payment, PaymentCreateRequest } from "../models/Payment.inteface";
 

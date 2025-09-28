@@ -13,22 +13,18 @@ export class SuperAdminService {
 
     private baseUrl = environment.apiUrl + '/superadmin';
 
-    // Create a new bank
     createBank(bankData: BankCreateRequest): Observable<ApiResponse<Bank>> {
         return this.http.post<ApiResponse<Bank>>(`${this.baseUrl}/banks`, bankData);
     }
 
-    // Get all banks
     getAllBanks(): Observable<ApiResponse<Bank[]>> {
         return this.http.get<ApiResponse<Bank[]>>(`${this.baseUrl}/banks`);
     }
 
-    // Get bank by ID
     getBankById(id: number): Observable<ApiResponse<Bank>> {
         return this.http.get<ApiResponse<Bank>>(`${this.baseUrl}/banks/${id}`);
     }
 
-    // Delete a bank
     deleteBank(id: number): Observable<ApiResponse<boolean>> {
         return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/banks/${id}`);
     }
