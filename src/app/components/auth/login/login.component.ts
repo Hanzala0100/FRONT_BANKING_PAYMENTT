@@ -1,9 +1,9 @@
-
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { PersistenceService } from '../../../core/services/persistence.service';
+import { UserStateService } from '../../../core/services/user-state.service'; // Add this import
 import { LoginRequest } from '../../../shared/models/Auth.interface';
 import { CommonModule } from '@angular/common';
 
@@ -24,6 +24,7 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private persistenceService: PersistenceService,
+    private userStateService: UserStateService,
     private router: Router
   ) {
     this.loginForm = this.formBuilder.group({
@@ -33,7 +34,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user is already logged in
     const token = this.persistenceService.get('token');
     if (token) {
       this.redirectBasedOnRole();
@@ -57,6 +57,9 @@ export class LoginComponent implements OnInit {
             this.persistenceService.set('token', response.data.token.accessToken);
             this.persistenceService.set('user', response.data.user);
             this.persistenceService.set('tokenExpiry', response.data.token.expiry);
+
+            // Update UserStateService - THIS WAS MISSING
+            this.userStateService.setCurrentUser(response.data.user);
 
             // Redirect based on user role
             this.redirectBasedOnRole(response.data.user.role);

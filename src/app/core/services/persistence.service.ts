@@ -25,7 +25,7 @@ export class PersistenceService {
         }
     }
 
-    delete(key: string): void {
+    remove(key: string): void {
         try {
             localStorage.removeItem(key);
         }
