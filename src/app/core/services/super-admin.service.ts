@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { environment } from "../../environments/environment";
-import { ApiResponse } from "../models/ApiResponse.interface";
-import { Bank, BankCreateRequest } from "../models/Bank.interface";
+import { environment } from "../../../environments/environment";
+import { ApiResponse } from "../../shared/models/ApiResponse.interface";
+import { Bank, BankCreateRequest } from "../../shared/models/Bank.interface";
 
 @Injectable({
     providedIn: 'root',

@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { environment } from "../../environments/environment";
-import { ApiResponse } from "../models/ApiResponse.interface";
-import { DownloadResponse, ReportStatistics, Report } from "../models/Report.interface";
+import { environment } from "../../../environments/environment";
+import { ApiResponse } from "../../shared/models/ApiResponse.interface";
+import { DownloadResponse, ReportStatistics, Report } from "../../shared/models/Report.interface";
 
 
 @Injectable({

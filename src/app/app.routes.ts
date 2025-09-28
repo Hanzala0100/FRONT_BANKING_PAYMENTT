@@ -1,14 +1,35 @@
-
-
-
-import { NgModule } from '@angular/core';
 import { Routes } from '@angular/router';
-import { AuthGuardService } from './guards/authGuardService';
-import { LoginComponent } from './components/login/login.component';
+import { AuthGuardService } from './core/guards/authGuardService';
+import { LoginComponent } from './components/auth/login/login.component';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+
 
 export const routes: Routes = [
+    // Public routes
     { path: '', redirectTo: '/login', pathMatch: 'full' },
     { path: 'login', component: LoginComponent },
-    // { path: 'dashboard', component: DashboardComponent,canActivate: [AuthGuardService] },
-    { path: '**', redirectTo: '/login' }
+
+    // Super Admin routes
+    {
+        path: 'super-admin',
+        canActivate: [AuthGuardService],
+        loadChildren: () => import('./components/super-admin/super-admin.routes').then(m => m.SUPER_ADMIN_ROUTES)
+    },
+
+    // Bank Admin routes
+    {
+        path: 'bank-admin',
+        canActivate: [AuthGuardService],
+        loadChildren: () => import('./components/bank-user/bank-user.routes').then(m => m.BANK_USER_ROUTES)
+    },
+
+    // Client User routes
+    {
+        path: 'client',
+        canActivate: [AuthGuardService],
+        loadChildren: () => import('./components/client-user/client-user.routes').then(m => m.CLIENT_USER_ROUTES)
+    },
+
+    // 404 - Not Found
+    { path: '**', component: NotFoundComponent }
 ];

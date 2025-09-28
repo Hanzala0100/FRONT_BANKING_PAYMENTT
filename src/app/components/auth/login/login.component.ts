@@ -2,11 +2,10 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { PersistenceService } from '../../services/persistence.service';
-import { LoginRequest } from '../../models/Auth.interface';
+import { AuthService } from '../../../core/services/auth.service';
+import { PersistenceService } from '../../../core/services/persistence.service';
+import { LoginRequest } from '../../../shared/models/Auth.interface';
 import { CommonModule } from '@angular/common';
-
 
 @Component({
   selector: 'app-login',
@@ -20,7 +19,6 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   showPassword = false;
   errorMessage = '';
-
 
   constructor(
     private formBuilder: FormBuilder,

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { User } from '../models/User.interface';
+import { User } from '../../shared/models/User.interface';
 import { PersistenceService } from './persistence.service';
 
 @Injectable({

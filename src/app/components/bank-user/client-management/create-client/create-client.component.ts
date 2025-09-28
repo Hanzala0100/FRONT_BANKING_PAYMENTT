@@ -1,0 +1,291 @@
+// components/bank-user/client-management/create-client/create-client.component.ts
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { BankUserService } from '../../../../core/services/bank-user.service';
+import { UserStateService } from '../../../../core/services/user-state.service';
+import { ClientCreateRequest } from '../../../../shared/models/Client.interface';
+
+@Component({
+  selector: 'app-create-client',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `
+    <div class="p-6 max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex items-center space-x-4 mb-4">
+          <a routerLink="/bank-admin/clients" 
+             class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+            <ion-icon name="arrow-back-outline" class="text-lg text-gray-600"></ion-icon>
+          </a>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Add New Client</h1>
+            <p class="text-gray-600">Onboard a new corporate client to your bank</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          
+          <!-- Basic Information Section -->
+          <div class="space-y-6">
+            <div class="border-b border-gray-200 pb-4">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <ion-icon name="business-outline" class="mr-2 text-blue-600"></ion-icon>
+                Basic Information
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">Enter the company's basic details</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Company Name -->
+              <div class="md:col-span-2">
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                  Company Name <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="name"
+                  formControlName="name"
+                  placeholder="Enter company name"
+                  class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  [class.border-red-300]="clientForm.get('name')?.invalid && clientForm.get('name')?.touched">
+                <div *ngIf="clientForm.get('name')?.invalid && clientForm.get('name')?.touched" 
+                     class="text-red-600 text-sm mt-1 flex items-center">
+                  <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+                  Company name is required
+                </div>
+              </div>
+
+              <!-- Registration Number -->
+              <div>
+                <label for="registrationNumber" class="block text-sm font-medium text-gray-700 mb-2">
+                  Registration Number <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="registrationNumber"
+                  formControlName="registrationNumber"
+                  placeholder="e.g., CIN, Registration No."
+                  class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  [class.border-red-300]="clientForm.get('registrationNumber')?.invalid && clientForm.get('registrationNumber')?.touched">
+                <div *ngIf="clientForm.get('registrationNumber')?.invalid && clientForm.get('registrationNumber')?.touched" 
+                     class="text-red-600 text-sm mt-1 flex items-center">
+                  <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+                  Registration number is required
+                </div>
+              </div>
+
+              <!-- Bank Name (Auto-filled) -->
+              <div>
+                <label for="bankName" class="block text-sm font-medium text-gray-700 mb-2">
+                  Bank Name
+                </label>
+                <input 
+                  type="text" 
+                  id="bankName"
+                  formControlName="bankName"
+                  readonly
+                  class="block w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500">
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div>
+              <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+                Registered Address <span class="text-red-500">*</span>
+              </label>
+              <textarea 
+                id="address"
+                formControlName="address"
+                rows="3"
+                placeholder="Enter complete registered address"
+                class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                [class.border-red-300]="clientForm.get('address')?.invalid && clientForm.get('address')?.touched">
+              </textarea>
+              <div *ngIf="clientForm.get('address')?.invalid && clientForm.get('address')?.touched" 
+                   class="text-red-600 text-sm mt-1 flex items-center">
+                <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+                Address is required
+              </div>
+            </div>
+          </div>
+
+          <!-- Information Notice -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start">
+              <ion-icon name="information-circle" class="text-blue-600 text-xl mr-3 mt-0.5"></ion-icon>
+              <div>
+                <h3 class="text-sm font-medium text-blue-900 mb-1">What happens after registration?</h3>
+                <ul class="text-sm text-blue-800 space-y-1">
+                  <li>• Client will be created with "Pending" verification status</li>
+                  <li>• You can upload required documents for verification</li>
+                  <li>• Client users can be added after verification approval</li>
+                  <li>• Payment processing will be enabled post-verification</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <ion-icon name="alert-circle" class="text-red-500 text-lg mr-2"></ion-icon>
+              <p class="text-red-700 text-sm font-medium">{{ errorMessage }}</p>
+            </div>
+          </div>
+
+          <!-- Success Message -->
+          <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <ion-icon name="checkmark-circle" class="text-green-500 text-lg mr-2"></ion-icon>
+              <p class="text-green-700 text-sm font-medium">{{ successMessage }}</p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+            <button 
+              type="button"
+              routerLink="/bank-admin/clients"
+              class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+              Cancel
+            </button>
+            <button 
+              type="submit"
+              [disabled]="clientForm.invalid || isLoading"
+              class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors font-medium flex items-center">
+              <span *ngIf="!isLoading">Create Client</span>
+              <span *ngIf="isLoading" class="flex items-center">
+                <ion-icon name="refresh-outline" class="animate-spin mr-2"></ion-icon>
+                Creating...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `,
+  styles: [`
+    :host {
+      display: block;
+    }
+  `]
+})
+export class CreateClientComponent implements OnInit {
+  clientForm: FormGroup;
+  isLoading = false;
+  errorMessage = '';
+  successMessage = '';
+  currentUser: any;
+
+  constructor(
+    private fb: FormBuilder,
+    private bankUserService: BankUserService,
+    private userStateService: UserStateService,
+    private router: Router
+  ) {
+    this.clientForm = this.createForm();
+  }
+
+  ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      registrationNumber: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      address: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+      bankName: [{ value: '', disabled: true }],
+      bankId: [0]
+    });
+  }
+
+  private initializeForm(): void {
+    // Get current user info
+    this.currentUser = this.userStateService.currentUser;
+
+    if (this.currentUser) {
+      this.clientForm.patchValue({
+        bankName: this.currentUser.bankName || 'Your Bank',
+        bankId: this.currentUser.bankId
+      });
+    }
+  }
+
+  onSubmit(): void {
+    if (this.clientForm.invalid) {
+      this.markFormGroupTouched();
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const formData: ClientCreateRequest = {
+      name: this.clientForm.get('name')?.value?.trim(),
+      registrationNumber: this.clientForm.get('registrationNumber')?.value?.trim(),
+      address: this.clientForm.get('address')?.value?.trim(),
+      bankId: this.currentUser?.bankId || 0,
+      bankName: this.currentUser?.bankName || 'Your Bank'
+    };
+
+    this.bankUserService.createClient(formData).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+
+        if (response.success) {
+          this.successMessage = 'Client created successfully! Redirecting...';
+          this.clientForm.reset();
+
+          // Redirect after 2 seconds
+          setTimeout(() => {
+            this.router.navigate(['/bank-admin/clients']);
+          }, 2000);
+        } else {
+          this.errorMessage = response.message || 'Failed to create client. Please try again.';
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error creating client:', error);
+
+        if (error.status === 400) {
+          this.errorMessage = 'Invalid data. Please check the form and try again.';
+        } else if (error.status === 401) {
+          this.errorMessage = 'Session expired. Please log in again.';
+          this.router.navigate(['/login']);
+        } else if (error.status === 403) {
+          this.errorMessage = 'You do not have permission to create clients.';
+        } else {
+          this.errorMessage = 'An unexpected error occurred. Please try again later.';
+        }
+      }
+    });
+  }
+
+  private markFormGroupTouched(): void {
+    Object.keys(this.clientForm.controls).forEach(key => {
+      const control = this.clientForm.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+  // Helper methods for template
+  hasError(controlName: string, errorType: string): boolean {
+    const control = this.clientForm.get(controlName);
+    return control ? control.hasError(errorType) && control.touched : false;
+  }
+
+  isFieldInvalid(controlName: string): boolean {
+    const control = this.clientForm.get(controlName);
+    return control ? control.invalid && control.touched : false;
+  }
+}

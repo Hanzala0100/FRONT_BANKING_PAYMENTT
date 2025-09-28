@@ -4,8 +4,8 @@ import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, CUST
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { User } from '../../models/User.interface';
-import { AuthService } from '../../services/auth.service';
-import { UserStateService } from '../../services/user-state.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { UserStateService } from '../../../core/services/user-state.service';
 
 @Component({
   selector: 'app-navbar',

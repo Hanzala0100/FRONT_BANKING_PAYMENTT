@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { ApiResponse } from "../models/ApiResponse.interface";
+import { ApiResponse } from "../../shared/models/ApiResponse.interface";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { environment } from "../../environments/environment";
-import { ClientVerificationRequest } from "../models/Document.interface";
-import { User, UserCreateRequest } from "../models/User.interface";
-import { Payment, PaymentApprovalRequest } from "../models/Payment.inteface";
-import { Client, ClientCreateRequest, ClientUserCreateRequest } from "../models/Client.interface";
-import { VerificationStatus } from "../enums/Verification-status.enum";
+import { environment } from "../../../environments/environment";
+import { ClientVerificationRequest } from "../../shared/models/Document.interface";
+import { User, UserCreateRequest } from "../../shared/models/User.interface";
+import { Payment, PaymentApprovalRequest } from "../../shared/models/Payment.inteface";
+import { Client, ClientCreateRequest, ClientUserCreateRequest } from "../../shared/models/Client.interface";
+import { VerificationStatus } from "../../shared/enums/Verification-status.enum";
 
 @Injectable({
     providedIn: 'root',

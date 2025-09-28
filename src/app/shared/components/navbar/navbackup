@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, CUST
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { User } from '../../models/User.interface';
-import { AuthService } from '../../services/auth.service';
-import { PersistenceService } from '../../services/persistence.service';
+import { AuthService } from '../../../services/auth.service';
+import { PersistenceService } from '../../../services/persistence.service';
 import { CommonModule } from '@angular/common';
 
 

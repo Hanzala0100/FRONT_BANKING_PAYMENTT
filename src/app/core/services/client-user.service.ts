@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { environment } from "../../environments/environment";
-import { ApiResponse } from "../models/ApiResponse.interface";
-import { User, UserCreateRequest } from "../models/User.interface";
-import { Employee, EmployeeCreateRequest } from "../models/Employee.interface";
-import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../models/Salary.interface";
-import { Beneficiary, BeneficiaryCreateRequest } from "../models/Beneficiary.interface";
-import { Payment, PaymentCreateRequest } from "../models/Payment.inteface";
+import { environment } from "../../../environments/environment";
+import { ApiResponse } from "../../shared/models/ApiResponse.interface";
+import { User, UserCreateRequest } from "../../shared/models/User.interface";
+import { Employee, EmployeeCreateRequest } from "../../shared/models/Employee.interface";
+import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../../shared/models/Salary.interface";
+import { Beneficiary, BeneficiaryCreateRequest } from "../../shared/models/Beneficiary.interface";
+import { Payment, PaymentCreateRequest } from "../../shared/models/Payment.inteface";
 
 @Injectable({
     providedIn: 'root',
