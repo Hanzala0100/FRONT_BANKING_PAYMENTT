@@ -12,7 +12,7 @@ export const BANK_USER_ROUTES: Routes = [
             },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./dashboard/bank-user-dashboard.component').then(m => m.BankUserDashboardComponent)
+                loadComponent: () => import('./bank-user-dashboard/bank-user-dashboard.component').then(m => m.BankUserDashboardComponent)
             },
             {
                 path: 'clients',
@@ -48,15 +48,15 @@ export const BANK_USER_ROUTES: Routes = [
             },
             {
                 path: 'reports',
-                loadComponent: () => import('./reports/report-dashboard/report-dashboard.component').then(m => m.ReportDashboardComponent)
+                loadComponent: () => import('./bank-reports/report-dashboard/report-dashboard.component').then(m => m.ReportDashboardComponent)
             },
             {
                 path: 'reports/generate',
-                loadComponent: () => import('./reports/report-generator/report-generator.component').then(m => m.ReportGeneratorComponent)
+                loadComponent: () => import('./bank-reports/report-generator/report-generator.component').then(m => m.ReportGeneratorComponent)
             },
             {
                 path: 'reports/history',
-                loadComponent: () => import('./reports/report-history/report-history.component').then(m => m.ReportHistoryComponent)
+                loadComponent: () => import('./bank-reports/report-history/report-history.component').then(m => m.ReportHistoryComponent)
             }
         ]
     }
