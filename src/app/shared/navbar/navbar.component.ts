@@ -1,95 +1,193 @@
+
 import { CommonModule } from '@angular/common';
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { User } from '../../models/User.interface';
+import { AuthService } from '../../services/auth.service';
+import { UserStateService } from '../../services/user-state.service';
 
 @Component({
-  selector: 'app-navbar-old',
+  selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule, RouterModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  standalone: true
+  imports: [CommonModule]
 })
-export class NavbarComponent implements OnInit {
-  isSidebarOpen: boolean = false;
-  isLogoutPopupOpen: boolean = false;
+export class NavbarComponent implements OnInit, OnDestroy {
+  @ViewChild('userMenuRef', { static: false }) userMenuRef!: ElementRef;
 
+  currentUser: User | null = null;
+  isUserMenuOpen = false;
+  isLoggingOut = false;
 
-  navigationItems = [
-    {
-      label: 'Teams',
-      route: '/dashboard',
-      icon: 'people-outline',
-      color: 'text-blue-600'
-    },
-    {
-      label: 'Matches',
-      route: '/matches',
-      icon: 'trophy-outline',
-      color: 'text-red-600'
-    },
-    {
-      label: 'Select Draw Players',
-      route: '/select-draw-players',
-      icon: 'person-add-outline',
-      color: 'text-green-600'
-    },
-    {
-      label: 'Voting',
-      route: '/voting',
-      icon: 'checkmark-circle-outline',
-      color: 'text-indigo-600'
-    },
-    {
-      label: 'Lucky Draws',
-      route: '/lucky-draw-listing',
-      icon: 'gift-outline',
-      color: 'text-yellow-600'
-    },
-    {
-      label: 'Config',
-      route: '/config',
-      icon: 'settings-outline',
-      color: 'text-gray-600'
-    },
-    {
-      label: 'Customer Votes',
-      route: '/customer-votes',
-      icon: 'thumbs-up-outline',
-      color: 'text-pink-600'
-    },
-    {
-      label: 'Player Votes',
-      route: '/player-votes',
-      icon: 'bar-chart-outline',
-      color: 'text-blue-700'
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(
+    private authService: AuthService,
+    private userStateService: UserStateService,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    const userSub = this.userStateService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+
+    this.subscriptions.add(userSub);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (this.userMenuRef && !this.userMenuRef.nativeElement.contains(event.target as Node)) {
+      this.closeUserMenu();
     }
-  ];
-
-
-
-  constructor(private router: Router) { }
-
-  ngOnInit() { }
-
-  toggleSidebar() {
-    this.isSidebarOpen = !this.isSidebarOpen;
   }
 
-  closeSidebar() {
-    this.isSidebarOpen = false;
+  @HostListener('window:keydown.escape', ['$event'])
+  onEscapePressed(event: KeyboardEvent): void {
+    if (this.isUserMenuOpen) {
+      this.closeUserMenu();
+    }
   }
 
-  logout() {
-    // this.authService.logout();
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  closeUserMenu(): void {
+    this.isUserMenuOpen = false;
+  }
+
+  logout(): void {
+    if (this.isLoggingOut) return;
+
+    this.isLoggingOut = true;
+
+    const logoutSub = this.authService.logout().subscribe({
+      next: (response) => {
+        this.handleLogoutSuccess();
+      },
+      error: (error) => {
+        console.error('Logout error:', error);
+        // Even if logout API fails, clear local storage and redirect
+        this.handleLogoutSuccess();
+      }
+    });
+
+    this.subscriptions.add(logoutSub);
+  }
+
+  private handleLogoutSuccess(): void {
+    // Clear user state - this will notify all subscribers
+    this.userStateService.clearUser();
+
+    // Reset component state
+    this.currentUser = null;
+    this.isUserMenuOpen = false;
+    this.isLoggingOut = false;
+
+    // Redirect to login page
     this.router.navigate(['/login']);
-    this.isLogoutPopupOpen = false;
   }
 
-  // Close sidebar when clicking on navigation item (for mobile)
-  onNavigate() {
-    if (window.innerWidth < 768) {
-      this.closeSidebar();
+  getUserInitials(fullName?: string): string {
+    if (!fullName) return 'U';
+
+    const names = fullName.trim().split(' ');
+    if (names.length >= 2) {
+      return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    } else if (names.length === 1) {
+      return names[0][0].toUpperCase();
     }
+    return 'U';
+  }
+
+  getRoleIcon(role?: string): string {
+    switch (role) {
+      case 'SuperAdmin':
+        return 'settings-outline';
+      case 'BankAdmin':
+        return 'business-outline';
+      case 'Client':
+        return 'person-outline';
+      default:
+        return 'person-outline';
+    }
+  }
+
+  getRoleBadgeClass(role?: string): string {
+    switch (role) {
+      case 'SuperAdmin':
+        return 'bg-purple-100 text-purple-800 border border-purple-200';
+      case 'BankAdmin':
+        return 'bg-blue-100 text-blue-800 border border-blue-200';
+      case 'Client':
+        return 'bg-green-100 text-green-800 border border-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+  }
+
+  getRoleName(role?: string): string {
+    switch (role) {
+      case 'SuperAdmin':
+        return 'Super Administrator';
+      case 'BankAdmin':
+        return 'Bank Administrator';
+      case 'Client':
+        return 'Client User';
+      default:
+        return 'User';
+    }
+  }
+
+  // Helper method to check if user has a specific role
+  hasRole(role: string): boolean {
+    return this.userStateService.hasRole(role);
+  }
+
+  // Helper method to check if user belongs to a bank
+  hasBankAccess(): boolean {
+    return this.userStateService.hasBankAccess();
+  }
+
+  // Helper method to check if user belongs to a client
+  hasClientAccess(): boolean {
+    return this.userStateService.hasClientAccess();
+  }
+
+  // Navigation helpers (can be expanded based on role-based routing)
+  navigateToProfile(): void {
+    this.closeUserMenu();
+    // Navigate to profile page based on role
+    if (this.hasRole('SuperAdmin')) {
+      this.router.navigate(['/super-admin/profile']);
+    } else if (this.hasRole('BankAdmin')) {
+      this.router.navigate(['/bank-admin/profile']);
+    } else {
+      this.router.navigate(['/client/profile']);
+    }
+  }
+
+  navigateToSettings(): void {
+    this.closeUserMenu();
+    // Navigate to settings page based on role
+    if (this.hasRole('SuperAdmin')) {
+      this.router.navigate(['/super-admin/settings']);
+    } else if (this.hasRole('BankAdmin')) {
+      this.router.navigate(['/bank-admin/settings']);
+    } else {
+      this.router.navigate(['/client/settings']);
+    }
+  }
+
+  // Method to refresh user data (useful after profile updates)
+  refreshUserData(): void {
+    this.userStateService.refreshUserState();
   }
 }

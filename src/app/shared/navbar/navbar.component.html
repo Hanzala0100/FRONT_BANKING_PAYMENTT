@@ -1,191 +1,228 @@
-<!-- navbar.component.html -->
-<div class="relative">
-  <!-- Top Navbar -->
-  <header class="bg-white shadow-sm border-b border-gray-200 relative z-30">
-    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Left Side: Sidebar Toggle + Logo -->
-        <div class="flex items-center space-x-4">
-          <!-- Sidebar Toggle Button -->
-          <button
-            (click)="toggleSidebar()"
-            class="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Toggle sidebar"
+<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-full px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Left Section - Logo and App Name -->
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-3">
+          <div
+            class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg"
           >
             <ion-icon
-              [name]="isSidebarOpen ? 'close-outline' : 'menu-outline'"
-              class="text-xl"
+              name="business-outline"
+              class="text-white text-lg"
             ></ion-icon>
+          </div>
+          <div class="hidden sm:block">
+            <h1 class="text-xl font-bold text-gray-900">Corporate Banking</h1>
+          </div>
+        </div>
+
+        <!-- Role Badge -->
+        <div class="hidden md:block">
+          <span
+            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+            [ngClass]="getRoleBadgeClass(currentUser?.role)"
+          >
+            <ion-icon
+              [name]="getRoleIcon(currentUser?.role)"
+              class="text-xs mr-1"
+            ></ion-icon>
+            {{ currentUser?.role }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Right Section - User Info and Actions -->
+      <div class="flex items-center space-x-4">
+        <!-- Notifications (Optional) -->
+        <button
+          class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors relative"
+        >
+          <ion-icon
+            name="notifications-outline"
+            class="text-gray-600 text-lg"
+          ></ion-icon>
+          <!-- Notification Badge -->
+          <span
+            class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"
+          ></span>
+        </button>
+
+        <!-- User Profile Section -->
+        <div class="relative" #userMenuRef>
+          <button
+            (click)="toggleUserMenu()"
+            class="flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <!-- User Avatar -->
+            <div
+              class="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+            >
+              <span class="text-white text-sm font-semibold">
+                {{ getUserInitials(currentUser?.fullName) }}
+              </span>
+            </div>
+
+            <!-- User Info (Hidden on mobile) -->
+            <div class="hidden lg:block text-left">
+              <p class="text-sm font-semibold text-gray-900">
+                {{ currentUser?.fullName }}
+              </p>
+              <p class="text-xs text-gray-500">{{ currentUser?.email }}</p>
+            </div>
+
+            <!-- Dropdown Arrow -->
+            <ion-icon
+              name="chevron-down-outline"
+              class="text-gray-400 text-sm transition-transform duration-200"
+              [class.rotate-180]="isUserMenuOpen"
+            >
+            </ion-icon>
           </button>
 
-          <!-- Logo & Title -->
-          <div class="flex items-center cursor-pointer" routerLink="/dashboard">
-            <div class="flex-shrink-0">
-              <div
-                class="h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center"
+          <!-- Dropdown Menu -->
+          <div
+            *ngIf="isUserMenuOpen"
+            class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+            (click)="$event.stopPropagation()"
+          >
+            <!-- User Info Header (Mobile View) -->
+            <div class="px-4 py-3 border-b border-gray-100 lg:hidden">
+              <p class="text-sm font-semibold text-gray-900">
+                {{ currentUser?.fullName }}
+              </p>
+              <p class="text-xs text-gray-500">{{ currentUser?.email }}</p>
+            </div>
+
+            <!-- User Details -->
+            <div class="px-4 py-3 border-b border-gray-100">
+              <div class="space-y-2">
+                <!-- Role Information -->
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Role:</span>
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium"
+                    [ngClass]="getRoleBadgeClass(currentUser?.role)"
+                  >
+                    <ion-icon
+                      [name]="getRoleIcon(currentUser?.role)"
+                      class="text-xs mr-1"
+                    ></ion-icon>
+                    {{ currentUser?.role }}
+                  </span>
+                </div>
+
+                <!-- Bank Information (if applicable) -->
+                <div
+                  *ngIf="currentUser?.bankName"
+                  class="flex items-center justify-between"
+                >
+                  <span class="text-sm text-gray-600">Bank:</span>
+                  <span class="text-sm font-medium text-gray-900">{{
+                    currentUser?.bankName
+                  }}</span>
+                </div>
+
+                <!-- Client Information (if applicable) -->
+                <div
+                  *ngIf="currentUser?.clientName"
+                  class="flex items-center justify-between"
+                >
+                  <span class="text-sm text-gray-600">Client:</span>
+                  <span class="text-sm font-medium text-gray-900">{{
+                    currentUser?.clientName
+                  }}</span>
+                </div>
+
+                <!-- Username -->
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Username:</span>
+                  <span class="text-sm font-medium text-gray-900">{{
+                    currentUser?.username
+                  }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="py-2">
+              <!-- Profile Settings -->
+              <button
+                class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <ion-icon
-                  name="business-outline"
-                  class="text-white text-lg"
+                  name="person-outline"
+                  class="text-gray-400 text-base mr-3"
                 ></ion-icon>
-              </div>
-            </div>
-            <div class="ml-3 hidden sm:block">
-              <h1 class="text-lg font-semibold text-gray-900">Dashboard</h1>
-              <p class="text-xs text-gray-600">🔥🔥</p>
-            </div>
-          </div>
-        </div>
+                Profile Settings
+              </button>
 
-        <!-- Right Side: Logout Button -->
-        <div class="flex items-center">
-          <div class="relative">
-            <button
-              (click)="isLogoutPopupOpen = !isLogoutPopupOpen"
-              class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-red-500 hover:bg-red-600 transition-colors duration-200 shadow-sm"
-            >
-              <ion-icon name="log-out-outline" class="mr-2"></ion-icon>
-              <span class="hidden sm:inline">Logout</span>
-            </button>
+              <!-- Security -->
+              <button
+                class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <ion-icon
+                  name="shield-outline"
+                  class="text-gray-400 text-base mr-3"
+                ></ion-icon>
+                Security
+              </button>
 
-            <!-- Logout Confirmation Popup -->
-            <div
-              *ngIf="isLogoutPopupOpen"
-              class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 shadow-lg rounded-lg z-50 overflow-hidden"
-            >
-              <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                <div class="flex items-center space-x-2">
-                  <ion-icon
-                    name="warning-outline"
-                    class="text-amber-500"
-                  ></ion-icon>
-                  <span class="text-sm font-medium text-gray-900"
-                    >Confirm Logout</span
-                  >
-                </div>
-              </div>
-              <div class="p-4">
-                <p class="text-sm text-gray-600 mb-4">
-                  Are you sure you want to logout?
-                </p>
-                <div class="flex justify-end space-x-2">
-                  <button
-                    (click)="isLogoutPopupOpen = false"
-                    class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    (click)="logout()"
-                    class="px-3 py-2 text-sm text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
+              <!-- Help -->
+              <button
+                class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <ion-icon
+                  name="help-circle-outline"
+                  class="text-gray-400 text-base mr-3"
+                ></ion-icon>
+                Help & Support
+              </button>
+            </div>
+
+            <!-- Logout Section -->
+            <div class="border-t border-gray-100 pt-2">
+              <button
+                (click)="logout()"
+                [disabled]="isLoggingOut"
+                class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+              >
+                <div
+                  *ngIf="isLoggingOut"
+                  class="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-3"
+                ></div>
+                <ion-icon
+                  *ngIf="!isLoggingOut"
+                  name="log-out-outline"
+                  class="text-red-500 text-base mr-3"
+                ></ion-icon>
+                {{ isLoggingOut ? "Logging out..." : "Logout" }}
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </header>
-
-  <!-- Sidebar Overlay (Mobile) -->
-  <div
-    *ngIf="isSidebarOpen"
-    class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
-    (click)="closeSidebar()"
-  ></div>
-
-  <!-- Sidebar -->
-  <aside
-    [class]="
-      'fixed top-0 left-0 h-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-40 ' +
-      (isSidebarOpen ? 'translate-x-0' : '-translate-x-full')
-    "
-    class="w-64 border-r border-gray-200"
-  >
-    <!-- Sidebar Header -->
-    <div
-      class="h-16 flex items-center justify-between px-6 border-b border-gray-200 bg-gray-50"
-    >
-      <div class="flex items-center space-x-3">
-        <div
-          class="h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center"
-        >
-          <ion-icon name="layers-outline" class="text-white text-lg"></ion-icon>
-        </div>
-        <span class="font-semibold text-gray-900">Navigation</span>
-      </div>
-      <button
-        (click)="closeSidebar()"
-        class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-colors md:hidden"
-      >
-        <ion-icon name="close-outline" class="text-lg"></ion-icon>
-      </button>
-    </div>
-
-    <!-- Navigation Menu -->
-    <nav class="flex-1 px-4 py-6 space-y-2">
-      <div *ngFor="let item of navigationItems" class="group">
-        <a
-          [routerLink]="item.route"
-          routerLinkActive="bg-blue-50 text-blue-700 border-r-2 border-blue-600"
-          (click)="onNavigate()"
-          class="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 group-hover:translate-x-1"
-        >
-          <div
-            [class]="
-              'p-2 rounded-lg bg-gray-100 group-hover:bg-white transition-colors ' +
-              item.color
-            "
-          >
-            <ion-icon [name]="item.icon" class="text-lg"></ion-icon>
-          </div>
-          <span>{{ item.label }}</span>
-          <ion-icon
-            name="chevron-forward-outline"
-            class="text-gray-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-          ></ion-icon>
-        </a>
-      </div>
-    </nav>
-
-    <!-- Sidebar Footer -->
-    <!-- <div class="border-t border-gray-200 p-4">
-      <div
-        class="flex items-center space-x-3 px-4 py-2 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg"
-      >
-        <div
-          class="h-8 w-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center"
-        >
-          <ion-icon name="person-outline" class="text-white text-sm"></ion-icon>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 truncate">Admin User</p>
-          <p class="text-xs text-gray-500 truncate">admintridentity.com</p>
-        </div>
-      </div>
-    </div> -->
-  </aside>
-
-  <!-- Main Content Wrapper -->
-  <div
-    [class]="
-      'transition-all duration-300 ease-in-out ' +
-      (isSidebarOpen ? 'md:ml-64' : 'ml-0')
-    "
-  >
-    <!-- This is where your main content/router-outlet will go -->
-    <div class="min-h-screen bg-gray-50">
-      <!-- Your page content goes here -->
     </div>
   </div>
-</div>
 
-<!-- Click outside to close sidebar on desktop -->
+  <!-- Mobile Role Badge (shown when desktop badge is hidden) -->
+  <div class="md:hidden px-4 pb-2">
+    <span
+      class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+      [ngClass]="getRoleBadgeClass(currentUser?.role)"
+    >
+      <ion-icon
+        [name]="getRoleIcon(currentUser?.role)"
+        class="text-xs mr-1"
+      ></ion-icon>
+      {{ currentUser?.role }}
+    </span>
+  </div>
+</nav>
+
+<!-- Overlay for mobile menu -->
 <div
-  *ngIf="isSidebarOpen"
-  class="hidden md:block fixed inset-0 z-10"
-  (click)="closeSidebar()"
+  *ngIf="isUserMenuOpen"
+  class="fixed inset-0 z-40 lg:hidden"
+  (click)="closeUserMenu()"
 ></div>

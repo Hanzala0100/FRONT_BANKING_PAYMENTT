@@ -16,7 +16,7 @@ export class AuthService {
     url = environment.apiUrl + '/Auth';
 
     login(data: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-        return this.http.post<ApiResponse<LoginResponse>>(`${this.url}/login`, { data: data });
+        return this.http.post<ApiResponse<LoginResponse>>(`${this.url}/login`, data);
     }
 
     logout(): Observable<ApiResponse<null>> {

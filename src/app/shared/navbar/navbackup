@@ -1,0 +1,199 @@
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, HostListener, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { User } from '../../models/User.interface';
+import { AuthService } from '../../services/auth.service';
+import { PersistenceService } from '../../services/persistence.service';
+import { CommonModule } from '@angular/common';
+
+
+@Component({
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.css'],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [CommonModule]
+})
+export class NavbarComponent implements OnInit, OnDestroy {
+    @ViewChild('userMenuRef', { static: false }) userMenuRef!: ElementRef;
+
+    currentUser: User | null = null;
+    isUserMenuOpen = false;
+    isLoggingOut = false;
+
+    private subscriptions: Subscription = new Subscription();
+
+    constructor(
+        private authService: AuthService,
+        private persistenceService: PersistenceService,
+        private router: Router
+    ) { }
+
+    ngOnInit(): void {
+        this.loadCurrentUser();
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
+    }
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: Event): void {
+        if (this.userMenuRef && !this.userMenuRef.nativeElement.contains(event.target as Node)) {
+            this.closeUserMenu();
+        }
+    }
+
+    @HostListener('window:keydown.escape', ['$event'])
+    onEscapePressed(event: KeyboardEvent): void {
+        if (this.isUserMenuOpen) {
+            this.closeUserMenu();
+        }
+    }
+
+    private loadCurrentUser(): void {
+        const userData = this.persistenceService.get('user') as User;
+        if (userData) {
+            this.currentUser = userData;
+        } else {
+            // If no user data found, redirect to login
+            this.router.navigate(['/login']);
+        }
+    }
+
+    toggleUserMenu(): void {
+        this.isUserMenuOpen = !this.isUserMenuOpen;
+    }
+
+    closeUserMenu(): void {
+        this.isUserMenuOpen = false;
+    }
+
+    logout(): void {
+        if (this.isLoggingOut) return;
+
+        this.isLoggingOut = true;
+
+        const logoutSub = this.authService.logout().subscribe({
+            next: (response) => {
+                this.handleLogoutSuccess();
+            },
+            error: (error) => {
+                console.error('Logout error:', error);
+                // Even if logout API fails, clear local storage and redirect
+                this.handleLogoutSuccess();
+            }
+        });
+
+        this.subscriptions.add(logoutSub);
+    }
+
+    private handleLogoutSuccess(): void {
+        // Clear all stored data
+        this.persistenceService.delete('token');
+        this.persistenceService.delete('user');
+        this.persistenceService.delete('tokenExpiry');
+
+        // Reset component state
+        this.currentUser = null;
+        this.isUserMenuOpen = false;
+        this.isLoggingOut = false;
+
+        // Redirect to login page
+        this.router.navigate(['/login']);
+    }
+
+    getUserInitials(fullName?: string): string {
+        if (!fullName) return 'U';
+
+        const names = fullName.trim().split(' ');
+        if (names.length >= 2) {
+            return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+        } else if (names.length === 1) {
+            return names[0][0].toUpperCase();
+        }
+        return 'U';
+    }
+
+    getRoleIcon(role?: string): string {
+        switch (role) {
+            case 'SuperAdmin':
+                return 'settings-outline';
+            case 'BankAdmin':
+                return 'business-outline';
+            case 'Client':
+                return 'person-outline';
+            default:
+                return 'person-outline';
+        }
+    }
+
+    getRoleBadgeClass(role?: string): string {
+        switch (role) {
+            case 'SuperAdmin':
+                return 'bg-purple-100 text-purple-800 border border-purple-200';
+            case 'BankAdmin':
+                return 'bg-blue-100 text-blue-800 border border-blue-200';
+            case 'Client':
+                return 'bg-green-100 text-green-800 border border-green-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border border-gray-200';
+        }
+    }
+
+    getRoleName(role?: string): string {
+        switch (role) {
+            case 'SuperAdmin':
+                return 'Super Administrator';
+            case 'BankAdmin':
+                return 'Bank Administrator';
+            case 'Client':
+                return 'Client User';
+            default:
+                return 'User';
+        }
+    }
+
+    hasRole(role: string): boolean {
+        return this.currentUser?.role === role;
+    }
+
+    // Helper method to check if user belongs to a bank
+    hasBankAccess(): boolean {
+        return !!(this.currentUser?.bankId && this.currentUser?.bankName);
+    }
+
+    // Helper method to check if user belongs to a client
+    hasClientAccess(): boolean {
+        return !!(this.currentUser?.clientId && this.currentUser?.clientName);
+    }
+
+    // Navigation helpers (can be expanded based on role-based routing)
+    navigateToProfile(): void {
+        this.closeUserMenu();
+        // Navigate to profile page based on role
+        if (this.hasRole('SuperAdmin')) {
+            this.router.navigate(['/super-admin/profile']);
+        } else if (this.hasRole('BankAdmin')) {
+            this.router.navigate(['/bank-admin/profile']);
+        } else {
+            this.router.navigate(['/client/profile']);
+        }
+    }
+
+    navigateToSettings(): void {
+        this.closeUserMenu();
+        if (this.hasRole('SuperAdmin')) {
+            this.router.navigate(['/super-admin/settings']);
+        } else if (this.hasRole('BankAdmin')) {
+            this.router.navigate(['/bank-admin/settings']);
+        } else {
+            this.router.navigate(['/client/settings']);
+        }
+    }
+
+    // Method to refresh user data (useful after profile updates)
+    refreshUserData(): void {
+        this.loadCurrentUser();
+    }
+}

@@ -1,0 +1,112 @@
+<!-- login.component.html -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Logo/Header Section -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-xl mb-4">
+        <ion-icon name="business-outline" class="text-white text-2xl"></ion-icon>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Corporate Banking</h1>
+      <p class="text-gray-600">Sign in to your account</p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        
+        <!-- Username Field -->
+        <div class="space-y-2">
+          <label for="username" class="block text-sm font-semibold text-gray-700">
+            Username
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <ion-icon name="person-outline" class="text-gray-400 text-lg"></ion-icon>
+            </div>
+            <input 
+              type="text" 
+              id="username"
+              formControlName="username"
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+              placeholder="Enter your username"
+              [class.border-red-300]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+              [class.focus:ring-red-500]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+          </div>
+          <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" 
+               class="text-red-600 text-sm flex items-center">
+            <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+            Username is required
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="space-y-2">
+          <label for="password" class="block text-sm font-semibold text-gray-700">
+            Password
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <ion-icon name="lock-closed-outline" class="text-gray-400 text-lg"></ion-icon>
+            </div>
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              id="password"
+              formControlName="password"
+              class="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white"
+              placeholder="Enter your password"
+              [class.border-red-300]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              [class.focus:ring-red-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <button 
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="text-lg"></ion-icon>
+            </button>
+          </div>
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" 
+               class="text-red-600 text-sm flex items-center">
+            <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+            Password is required
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4">
+          <div class="flex items-center">
+            <ion-icon name="alert-circle" class="text-red-500 text-lg mr-2"></ion-icon>
+            <p class="text-red-700 text-sm font-medium">{{ errorMessage }}</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid || isLoading"
+          class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+          
+          <div *ngIf="isLoading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          <ion-icon *ngIf="!isLoading" name="log-in-outline" class="text-lg"></ion-icon>
+          <span>{{ isLoading ? 'Signing In...' : 'Sign In' }}</span>
+        </button>
+      </form>
+
+      <!-- Footer -->
+      <div class="mt-6 pt-6 border-t border-gray-100 text-center">
+        <p class="text-sm text-gray-500">
+          Secure login powered by advanced encryption
+        </p>
+        <div class="flex items-center justify-center mt-2">
+          <ion-icon name="shield-checkmark-outline" class="text-green-500 text-sm mr-1"></ion-icon>
+          <span class="text-xs text-green-600 font-medium">SSL Secured</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="text-center mt-6">
+      <p class="text-sm text-gray-500">
+        Need help? Contact your system administrator
+      </p>
+    </div>
+  </div>
+</div>
