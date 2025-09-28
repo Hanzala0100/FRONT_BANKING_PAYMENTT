@@ -1,4 +1,3 @@
-
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,7 +9,6 @@ import { Bank } from '../../../shared/models/Bank.interface';
 interface SystemReport extends Report {
   size?: string;
   downloadCount?: number;
-  status?: 'generating' | 'completed' | 'failed';
 }
 
 interface ReportFilter {
@@ -43,21 +41,14 @@ export class SuperAdminReportsComponent implements OnInit {
 
   reportTypes = [
     { value: 'all', label: 'All Reports' },
-    { value: 'overall_system_report', label: 'Overall System Report' },
-    // { value: 'bank_performance', label: 'Bank Performance' },
-    // { value: 'transaction_summary', label: 'Transaction Summary' },
-    // { value: 'user_activity', label: 'User Activity' },
-    // { value: 'security_audit', label: 'Security Audit' },
-    // { value: 'compliance', label: 'Compliance Report' }
+    { value: 'overall_system_report', label: 'Overall System Report' }
   ];
 
   dateRanges = [
     { value: 'all', label: 'All Time' },
     { value: 'today', label: 'Today' },
     { value: 'week', label: 'This Week' },
-    { value: 'month', label: 'This Month' },
-    { value: 'quarter', label: 'This Quarter' },
-    { value: 'year', label: 'This Year' }
+    { value: 'month', label: 'This Month' }
   ];
 
   quickReports = [
@@ -69,32 +60,6 @@ export class SuperAdminReportsComponent implements OnInit {
       color: 'blue',
       estimatedTime: '2-3 minutes'
     }
-
-    // ,
-    // {
-    //   title: 'Bank Performance',
-    //   description: 'Performance metrics for all registered banks',
-    //   type: 'bank_performance',
-    //   icon: 'business-outline',
-    //   color: 'green',
-    //   estimatedTime: '3-5 minutes'
-    // },
-    // {
-    //   title: 'Transaction Summary',
-    //   description: 'All transaction data across the platform',
-    //   type: 'transaction_summary',
-    //   icon: 'card-outline',
-    //   color: 'purple',
-    //   estimatedTime: '5-7 minutes'
-    // },
-    // {
-    //   title: 'Security Audit',
-    //   description: 'Security events and compliance status',
-    //   type: 'security_audit',
-    //   icon: 'shield-checkmark-outline',
-    //   color: 'red',
-    //   estimatedTime: '1-2 minutes'
-    // }
   ];
 
   constructor(
@@ -130,12 +95,7 @@ export class SuperAdminReportsComponent implements OnInit {
     this.reportService.getMyReports().subscribe({
       next: (response) => {
         if (response.success) {
-          this.reports = response.data.map(report => ({
-            ...report,
-            size: this.generateRandomSize(),
-            downloadCount: Math.floor(Math.random() * 50),
-            status: 'completed' as const
-          }));
+          this.reports = response.data;
         }
         this.isLoading = false;
       },
@@ -166,9 +126,7 @@ export class SuperAdminReportsComponent implements OnInit {
           // Add the new report to the list
           const newReport: SystemReport = {
             ...response.data,
-            size: this.generateRandomSize(),
-            downloadCount: 0,
-            status: 'completed'
+            downloadCount: 0
           };
           this.reports.unshift(newReport);
 
@@ -220,7 +178,6 @@ export class SuperAdminReportsComponent implements OnInit {
   }
 
   applyFilters(): void {
-
     this.loadReports();
   }
 
@@ -229,10 +186,6 @@ export class SuperAdminReportsComponent implements OnInit {
 
     if (this.filters.reportType !== 'all') {
       filtered = filtered.filter(report => report.type === this.filters.reportType);
-    }
-
-    if (this.filters.status !== 'all') {
-      filtered = filtered.filter(report => report.status === this.filters.status);
     }
 
     return filtered;
@@ -244,55 +197,11 @@ export class SuperAdminReportsComponent implements OnInit {
   }
 
   getReportIcon(type: string): string {
-    switch (type) {
-      case 'system_overview':
-        return 'analytics-outline';
-      case 'bank_performance':
-        return 'business-outline';
-      case 'transaction_summary':
-        return 'card-outline';
-      case 'user_activity':
-        return 'people-outline';
-      case 'security_audit':
-        return 'shield-checkmark-outline';
-      case 'compliance':
-        return 'checkmark-done-outline';
-      default:
-        return 'document-text-outline';
-    }
-  }
-
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'generating':
-        return 'bg-orange-100 text-orange-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    return 'document-text-outline';
   }
 
   getQuickReportColorClass(color: string): string {
-    switch (color) {
-      case 'blue':
-        return 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
-      case 'green':
-        return 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100';
-      case 'purple':
-        return 'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100';
-      case 'red':
-        return 'bg-red-50 border-red-200 text-red-700 hover:bg-red-100';
-      default:
-        return 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100';
-    }
-  }
-
-  private generateRandomSize(): string {
-    const sizes = ['1.2 MB', '2.5 MB', '3.1 MB', '4.7 MB', '1.8 MB', '2.2 MB'];
-    return sizes[Math.floor(Math.random() * sizes.length)];
+    return 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100';
   }
 
   getRelativeTime(timestamp: string): string {
