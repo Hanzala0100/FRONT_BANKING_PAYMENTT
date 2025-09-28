@@ -13,7 +13,7 @@ import { ApiResponse } from "../models/ApiResponse.interface";
 
 export class AuthService {
     constructor(private http: HttpClient) { }
-    url = environment.apiUrl + '/auth';
+    url = environment.apiUrl + '/Auth';
 
     login(data: LoginRequest): Observable<ApiResponse<LoginResponse>> {
         return this.http.post<ApiResponse<LoginResponse>>(`${this.url}/login`, { data: data });

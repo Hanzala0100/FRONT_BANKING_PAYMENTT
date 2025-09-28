@@ -1,9 +1,12 @@
+import { VerificationStatus } from "../enums/Verification-status.enum";
+
+
 export interface Client {
     id: number;
     name: string;
     registrationNumber: string;
     address: string;
-    verificationStatus: string;
+    verificationStatus: VerificationStatus;
     verifiedBy?: number;
     verifiedAt?: string;
     bankId: number;
@@ -29,4 +32,9 @@ export interface ClientUserCreateRequest {
     email: string;
     role: string;
     clientId?: number;
+}
+
+export interface ClientVerificationRequest {
+    verificationStatus: VerificationStatus;
+    notes: string;
 }

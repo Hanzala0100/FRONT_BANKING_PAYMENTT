@@ -7,6 +7,7 @@ import { ClientVerificationRequest } from "../models/Document.interface";
 import { User, UserCreateRequest } from "../models/User.interface";
 import { Payment, PaymentApprovalRequest } from "../models/Payment.inteface";
 import { Client, ClientCreateRequest, ClientUserCreateRequest } from "../models/Client.interface";
+import { VerificationStatus } from "../enums/Verification-status.enum";
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +15,7 @@ import { Client, ClientCreateRequest, ClientUserCreateRequest } from "../models/
 export class BankUserService {
     constructor(private http: HttpClient) { }
 
-    private baseUrl = environment.apiUrl + '/bankuser';
+    private baseUrl = environment.apiUrl + '/BankUser';
 
     // CLIENT MANAGEMENT
 
@@ -44,7 +45,7 @@ export class BankUserService {
         return this.http.put<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}/verify`, request);
     }
 
-    getClientsByVerificationStatus(status: string): Observable<ApiResponse<Client[]>> {
+    getClientsByVerificationStatus(status: VerificationStatus): Observable<ApiResponse<Client[]>> {
         return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients/verification-status/${status}`);
     }
 

@@ -15,7 +15,7 @@ import { Payment, PaymentCreateRequest } from "../models/Payment.inteface";
 export class ClientUserService {
     constructor(private http: HttpClient) { }
 
-    private baseUrl = environment.apiUrl + '/clientuser';
+    private baseUrl = environment.apiUrl + '/ClientUser';
 
     // USER MANAGEMENT
 

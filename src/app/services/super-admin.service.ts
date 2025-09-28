@@ -11,7 +11,7 @@ import { Bank, BankCreateRequest } from "../models/Bank.interface";
 export class SuperAdminService {
     constructor(private http: HttpClient) { }
 
-    private baseUrl = environment.apiUrl + '/superadmin';
+    private baseUrl = environment.apiUrl + '/SuperAdmin';
 
     createBank(bankData: BankCreateRequest): Observable<ApiResponse<Bank>> {
         return this.http.post<ApiResponse<Bank>>(`${this.baseUrl}/banks`, bankData);
