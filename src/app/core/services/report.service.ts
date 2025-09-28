@@ -7,34 +7,35 @@ import { DownloadResponse, ReportStatistics, Report } from "../../shared/models/
 
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class ReportService {
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    private baseUrl = environment.apiUrl + '/report';
+  private baseUrl = environment.apiUrl + '/report';
 
-    generateReport(): Observable<ApiResponse<Report>> {
-        return this.http.post<ApiResponse<Report>>(`${this.baseUrl}/generate-report`, {});
-    }
+  generateReport(): Observable<ApiResponse<Report>> {
+    return this.http.post<ApiResponse<Report>>(`${this.baseUrl}/generate-report`, {});
+  }
 
-    getMyReports(): Observable<ApiResponse<Report[]>> {
-        return this.http.get<ApiResponse<Report[]>>(`${this.baseUrl}/my-reports`);
-    }
+  getMyReports(): Observable<ApiResponse<Report[]>> {
+    return this.http.get<ApiResponse<Report[]>>(`${this.baseUrl}/my-reports`);
+  }
 
-    getReportById(id: number): Observable<ApiResponse<Report>> {
-        return this.http.get<ApiResponse<Report>>(`${this.baseUrl}/${id}`);
-    }
+  getReportById(id: number): Observable<ApiResponse<Report>> {
+    return this.http.get<ApiResponse<Report>>(`${this.baseUrl}/${id}`);
+  }
 
-    downloadReport(id: number): Observable<ApiResponse<DownloadResponse>> {
-        return this.http.get<ApiResponse<DownloadResponse>>(`${this.baseUrl}/download-report/${id}`);
-    }
+  downloadReport(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/download-report/${id}`, { responseType: 'blob' });
+  }
 
-    deleteReport(id: number): Observable<ApiResponse<boolean>> {
-        return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/${id}`);
-    }
 
-    getReportStatistics(): Observable<ApiResponse<ReportStatistics>> {
-        return this.http.get<ApiResponse<ReportStatistics>>(`${this.baseUrl}/statistics`);
-    }
+  deleteReport(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/${id}`);
+  }
+
+  getReportStatistics(): Observable<ApiResponse<ReportStatistics>> {
+    return this.http.get<ApiResponse<ReportStatistics>>(`${this.baseUrl}/statistics`);
+  }
 }

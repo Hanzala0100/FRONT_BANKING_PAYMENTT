@@ -3,19 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportService } from '../../../core/services/report.service';
 import { SuperAdminService } from '../../../core/services/super-admin.service';
-import { Report, ReportStatistics } from '../../../shared/models/Report.interface';
+import { Report, ReportStatistics, RecentReport } from '../../../shared/models/Report.interface';
 import { Bank } from '../../../shared/models/Bank.interface';
-
-interface SystemReport extends Report {
-  size?: string;
-  downloadCount?: number;
-}
 
 interface ReportFilter {
   dateRange: string;
   reportType: string;
   bankId?: number;
-  status: string;
 }
 
 @Component({
@@ -27,7 +21,7 @@ interface ReportFilter {
   styleUrls: ['./super-admin-reports.component.css']
 })
 export class SuperAdminReportsComponent implements OnInit {
-  reports: SystemReport[] = [];
+  reports: Report[] = [];
   banks: Bank[] = [];
   statistics: ReportStatistics | null = null;
   isLoading = true;
@@ -35,8 +29,7 @@ export class SuperAdminReportsComponent implements OnInit {
 
   filters: ReportFilter = {
     dateRange: 'all',
-    reportType: 'all',
-    status: 'all'
+    reportType: 'all'
   };
 
   reportTypes = [
@@ -124,14 +117,11 @@ export class SuperAdminReportsComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           // Add the new report to the list
-          const newReport: SystemReport = {
-            ...response.data,
-            downloadCount: 0
-          };
-          this.reports.unshift(newReport);
-
+          this.reports.unshift(response.data);
           // Refresh statistics
           this.loadStatistics();
+          // Reload reports to get updated list
+          this.loadReports();
         }
         this.isGenerating = false;
       },
@@ -143,32 +133,23 @@ export class SuperAdminReportsComponent implements OnInit {
   }
 
   downloadReport(reportId: number): void {
-    this.reportService.downloadReport(reportId).subscribe({
-      next: (response) => {
-        if (response.success && response.data.downloadUrl) {
-          // Create download link
-          const link = document.createElement('a');
-          link.href = response.data.downloadUrl;
-          link.download = `report_${reportId}.pdf`;
-          link.click();
-
-          // Update download count
-          const report = this.reports.find(r => r.id === reportId);
-          if (report && report.downloadCount !== undefined) {
-            report.downloadCount++;
-          }
-        }
-      },
-      error: (error) => console.error('Error downloading report:', error)
+    this.reportService.downloadReport(reportId).subscribe((blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `report_${reportId}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
     });
   }
+
 
   deleteReport(reportId: number): void {
     if (confirm('Are you sure you want to delete this report?')) {
       this.reportService.deleteReport(reportId).subscribe({
         next: (response) => {
           if (response.success) {
-            this.reports = this.reports.filter(r => r.id !== reportId);
+            this.reports = this.reports.filter(r => r.reportId !== reportId);
             this.loadStatistics();
           }
         },
@@ -181,11 +162,11 @@ export class SuperAdminReportsComponent implements OnInit {
     this.loadReports();
   }
 
-  getFilteredReports(): SystemReport[] {
+  getFilteredReports(): Report[] {
     let filtered = [...this.reports];
 
     if (this.filters.reportType !== 'all') {
-      filtered = filtered.filter(report => report.type === this.filters.reportType);
+      filtered = filtered.filter(report => report.reportType === this.filters.reportType);
     }
 
     return filtered;
@@ -218,5 +199,10 @@ export class SuperAdminReportsComponent implements OnInit {
       const days = Math.floor(diffInMinutes / 1440);
       return `${days} day${days > 1 ? 's' : ''} ago`;
     }
+  }
+
+  // Helper to get report count by type from statistics
+  getReportCountByType(type: string): number {
+    return this.statistics?.reportsByType[type] || 0;
   }
 }
