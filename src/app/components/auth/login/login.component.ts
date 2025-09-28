@@ -53,6 +53,7 @@ export class LoginComponent implements OnInit {
       this.authService.login(loginRequest).subscribe({
         next: (response) => {
           if (response.success) {
+            console.log(response.data.user.role, " role after login");
             // Store authentication data
             this.persistenceService.set('token', response.data.token.accessToken);
             this.persistenceService.set('user', response.data.user);
@@ -63,6 +64,7 @@ export class LoginComponent implements OnInit {
 
             // Redirect based on user role
             this.redirectBasedOnRole(response.data.user.role);
+
           } else {
             this.errorMessage = response.message || 'Login failed. Please try again.';
           }
@@ -85,23 +87,22 @@ export class LoginComponent implements OnInit {
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
-
   private redirectBasedOnRole(role?: string): void {
     const user = this.persistenceService.get('user') as any;
     const userRole = role || user?.role;
 
     switch (userRole) {
       case 'SuperAdmin':
-        this.router.navigate(['/super-admin/dashboard']);
+        this.router.navigate(['/super-admin']);
         break;
-      case 'BankAdmin':
-        this.router.navigate(['/bank-admin/dashboard']);
+      case 'BankUser':
+        this.router.navigate(['/bank-user']); // ✅ not /bank-user/dashboard
         break;
-      case 'Client':
-        this.router.navigate(['/client/dashboard']);
+      case 'ClientUser':
+        this.router.navigate(['/client-user']); // ✅ not /client-user/dashboard
         break;
       default:
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/login']);
         break;
     }
   }

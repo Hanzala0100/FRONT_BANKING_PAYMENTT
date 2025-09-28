@@ -4,7 +4,7 @@ import { PersistenceService } from "../services/persistence.service";
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const persistenceService = inject(PersistenceService);
-  const token = persistenceService.get('accessToken');
+  const token = persistenceService.get('token');
 
   if (token) {
     const cloned = req.clone({

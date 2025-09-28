@@ -1,4 +1,4 @@
 <div class="min-h-screen">
-  <app-navbar></app-navbar>
+  <app-navbar *ngIf="!isLoginPage()"></app-navbar>
   <router-outlet></router-outlet>
 </div>
