@@ -214,16 +214,16 @@
                     class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
                   >
                     <span class="text-lg font-medium text-white">
-                      <!-- {{ getBankInitials(bank.name) }} -->
-                      <ion-icon name="business-outline"></ion-icon>
+                      {{ getBankInitials(bank.bankName) }}
+                      <!-- <ion-icon name="business-outline"></ion-icon> -->
                     </span>
                   </div>
                 </div>
                 <div class="ml-4">
                   <div class="text-sm font-medium text-gray-900">
-                    {{ bank.name }}
+                    {{ bank.bankName }}
                   </div>
-                  <div class="text-sm text-gray-500">ID: {{ bank.id }}</div>
+                  <div class="text-sm text-gray-500">ID: {{ bank.bankId }}</div>
                 </div>
               </div>
             </td>
@@ -283,7 +283,7 @@
             >
               <div class="flex items-center space-x-2">
                 <a
-                  [routerLink]="['/super-admin/banks', bank.id]"
+                  [routerLink]="['/super-admin/banks', bank.bankId]"
                   class="text-blue-600 hover:text-blue-900 transition-colors"
                   title="View Details"
                 >
@@ -366,7 +366,7 @@
             <div class="mt-2">
               <p class="text-sm text-gray-500">
                 Are you sure you want to delete
-                <strong>{{ bankToDelete?.name }}</strong
+                <strong>{{ bankToDelete?.bankName }}</strong
                 >? This action cannot be undone and will remove all associated
                 data including:
               </p>

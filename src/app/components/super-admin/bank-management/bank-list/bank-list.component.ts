@@ -73,7 +73,7 @@ export class BankListComponent implements OnInit {
     if (this.searchTerm.trim()) {
       const search = this.searchTerm.toLowerCase();
       filtered = filtered.filter(bank =>
-        bank.name.toLowerCase().includes(search) ||
+        bank.bankName.toLowerCase().includes(search) ||
         bank.contactEmail.toLowerCase().includes(search) ||
         bank.adminUsername.toLowerCase().includes(search) ||
         bank.address.toLowerCase().includes(search)
@@ -86,8 +86,8 @@ export class BankListComponent implements OnInit {
 
       switch (this.sortBy) {
         case 'name':
-          aValue = a?.name?.toLowerCase();
-          bValue = b?.name?.toLowerCase();
+          aValue = a?.bankName?.toLowerCase();
+          bValue = b?.bankName?.toLowerCase();
           break;
         case 'totalClients':
           aValue = a?.totalClients;
@@ -102,8 +102,8 @@ export class BankListComponent implements OnInit {
           bValue = b?.adminUsername?.toLowerCase();
           break;
         default:
-          aValue = a?.id;
-          bValue = b?.id;
+          aValue = a?.bankId;
+          bValue = b?.bankId;
       }
 
       if (this.sortDirection === 'asc') {
@@ -144,10 +144,10 @@ export class BankListComponent implements OnInit {
     if (!this.bankToDelete) return;
 
     this.isDeletingBank = true;
-    this.superAdminService.deleteBank(this.bankToDelete.id).subscribe({
+    this.superAdminService.deleteBank(this.bankToDelete.bankId).subscribe({
       next: (response) => {
         if (response.success) {
-          this.allBanks = this.allBanks.filter(b => b.id !== this.bankToDelete!.id);
+          this.allBanks = this.allBanks.filter(b => b.bankId !== this.bankToDelete!.bankId);
           this.calculateStatistics();
           this.applyFilters();
           this.closeDeleteModal();
@@ -168,7 +168,7 @@ export class BankListComponent implements OnInit {
   }
 
   trackByBankId(index: number, bank: Bank): number {
-    return bank.id;
+    return bank.bankId;
   }
 
   refreshData(): void {

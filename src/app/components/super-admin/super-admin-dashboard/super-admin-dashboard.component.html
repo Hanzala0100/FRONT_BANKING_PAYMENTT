@@ -87,10 +87,10 @@
           <p class="text-3xl font-bold text-gray-900">
             {{ dashboardStats.totalBanks }}
           </p>
-          <p class="text-sm text-green-600 flex items-center mt-1">
+          <!-- <p class="text-sm text-green-600 flex items-center mt-1">
             <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
             +12% from last month
-          </p>
+          </p> -->
         </div>
       </div>
     </div>
@@ -109,10 +109,10 @@
           <p class="text-3xl font-bold text-gray-900">
             {{ dashboardStats.totalClients | number }}
           </p>
-          <p class="text-sm text-green-600 flex items-center mt-1">
+          <!-- <p class="text-sm text-green-600 flex items-center mt-1">
             <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
             +8% from last month
-          </p>
+          </p> -->
         </div>
       </div>
     </div>
@@ -131,10 +131,10 @@
           <p class="text-3xl font-bold text-gray-900">
             {{ dashboardStats.totalUsers | number }}
           </p>
-          <p class="text-sm text-green-600 flex items-center mt-1">
+          <!-- <p class="text-sm text-green-600 flex items-center mt-1">
             <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
             +15% from last month
-          </p>
+          </p> -->
         </div>
       </div>
     </div>
@@ -217,7 +217,7 @@
     </div>
 
     <!-- Recent Activity -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-gray-900 flex items-center">
           <ion-icon name="time-outline" class="mr-2 text-blue-600"></ion-icon>
@@ -254,7 +254,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 
   <!-- Recent Banks -->
@@ -312,14 +312,14 @@
                     class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
                   >
                     <span class="text-sm font-medium text-white">
-                      <ion-icon name="business-outline"></ion-icon>
-                      <!-- {{ getBankInitials(bank.name) }} -->
+                      <!-- <ion-icon name="business-outline"></ion-icon> -->
+                      {{ getBankInitials(bank.bankName) }}
                     </span>
                   </div>
                 </div>
                 <div class="ml-4">
                   <div class="text-sm font-medium text-gray-900">
-                    {{ bank.name }}
+                    {{ bank.bankName }}
                   </div>
                   <div class="text-sm text-gray-500">
                     {{ bank.contactEmail }}
@@ -339,7 +339,7 @@
               class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"
             >
               <a
-                [routerLink]="['/super-admin/banks', bank.id]"
+                [routerLink]="['/super-admin/banks', bank?.bankId]"
                 class="text-blue-600 hover:text-blue-900 transition-colors"
               >
                 <ion-icon name="eye-outline"></ion-icon>

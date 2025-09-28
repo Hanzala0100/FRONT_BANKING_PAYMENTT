@@ -1,6 +1,6 @@
 export interface Bank {
-  id: number;
-  name: string;
+  bankId: number;
+  bankName: string;
   address: string;
   contactEmail: string;
   contactPhone: string;

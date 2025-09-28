@@ -122,7 +122,7 @@ export class SuperAdminDashboardComponent implements OnInit {
         if (response.success) {
           this.dashboardStats.totalBanks = response.data.length;
           this.dashboardStats.recentBanks = response.data
-            .sort((a, b) => b.id - a.id)
+            .sort((a, b) => b.bankId - a.bankId)
             .slice(0, 5);
 
           // Calculate totals from banks
