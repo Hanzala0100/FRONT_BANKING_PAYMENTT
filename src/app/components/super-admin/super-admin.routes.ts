@@ -12,7 +12,7 @@ export const SUPER_ADMIN_ROUTES: Routes = [
             },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./dashboard/super-admin-dashboard.component').then(m => m.SuperAdminDashboardComponent)
+                loadComponent: () => import('./super-admin-dashboard/super-admin-dashboard.component').then(m => m.SuperAdminDashboardComponent)
             },
             {
                 path: 'banks',
@@ -28,7 +28,7 @@ export const SUPER_ADMIN_ROUTES: Routes = [
             },
             {
                 path: 'reports',
-                loadComponent: () => import('./reports/super-admin-reports.component').then(m => m.SuperAdminReportsComponent)
+                loadComponent: () => import('./super-admin-reports/super-admin-reports.component').then(m => m.SuperAdminReportsComponent)
             },
             {
                 path: 'system-logs',

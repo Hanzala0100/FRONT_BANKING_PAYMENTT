@@ -12,7 +12,7 @@ export const CLIENT_USER_ROUTES: Routes = [
             },
             {
                 path: 'dashboard',
-                loadComponent: () => import('./dashboard/client-user-dashboard.component').then(m => m.ClientUserDashboardComponent)
+                loadComponent: () => import('./client-user-dashboard/client-user-dashboard.component').then(m => m.ClientUserDashboardComponent)
             },
             {
                 path: 'employees',
