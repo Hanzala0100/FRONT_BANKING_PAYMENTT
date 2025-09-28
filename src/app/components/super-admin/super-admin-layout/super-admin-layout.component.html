@@ -1,1 +1,220 @@
-<p>super-admin-layout works!</p>
+<div class="flex h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
+    [class.translate-x-0]="isSidebarOpen"
+    [class.-translate-x-full]="!isSidebarOpen"
+  >
+    <!-- Sidebar Header -->
+    <div
+      class="flex items-center justify-between h-16 px-6 border-b border-gray-200"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="flex items-center justify-center w-8 h-8 bg-purple-600 rounded-lg"
+        >
+          <ion-icon
+            name="settings-outline"
+            class="text-white text-lg"
+          ></ion-icon>
+        </div>
+        <span class="text-lg font-bold text-gray-900">Super Admin</span>
+      </div>
+      <button
+        (click)="closeSidebar()"
+        class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+      >
+        <ion-icon name="close-outline" class="text-xl"></ion-icon>
+      </button>
+    </div>
+
+    <!-- User Info -->
+    <div
+      class="p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-blue-50"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"
+        >
+          <span class="text-white text-lg font-semibold">
+            {{ currentUser?.fullName?.substring(0, 2) | uppercase }}
+          </span>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-gray-900">
+            {{ currentUser?.fullName }}
+          </p>
+          <p class="text-xs text-gray-600">{{ currentUser?.email }}</p>
+          <span
+            class="inline-flex px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full mt-1"
+          >
+            System Administrator
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-4 py-6 overflow-y-auto">
+      <ul class="space-y-2">
+        <li *ngFor="let item of menuItems">
+          <!-- Menu Item -->
+          <div>
+            <!-- Main Menu Item -->
+            <a
+              *ngIf="!item.children; else menuWithChildren"
+              [routerLink]="item.route"
+              routerLinkActive="bg-purple-100 text-purple-700 border-purple-200"
+              class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-transparent"
+            >
+              <ion-icon [name]="item.icon" class="mr-3 text-lg"></ion-icon>
+              <span class="font-medium">{{ item.title }}</span>
+              <span
+                *ngIf="item.badge"
+                class="ml-auto bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded-full"
+              >
+                {{ item.badge }}
+              </span>
+            </a>
+
+            <!-- Menu Item with Children -->
+            <ng-template #menuWithChildren>
+              <button
+                (click)="toggleMenuItem(item)"
+                class="w-full flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                [class.bg-purple-50]="isParentActive(item)"
+                [class.text-purple-700]="isParentActive(item)"
+              >
+                <ion-icon [name]="item.icon" class="mr-3 text-lg"></ion-icon>
+                <span class="font-medium">{{ item.title }}</span>
+                <ion-icon
+                  name="chevron-down-outline"
+                  class="ml-auto text-sm transition-transform duration-200"
+                  [class.rotate-180]="item.isExpanded"
+                >
+                </ion-icon>
+              </button>
+
+              <!-- Submenu -->
+              <div *ngIf="item.isExpanded" class="ml-6 mt-2 space-y-1">
+                <a
+                  *ngFor="let child of item.children"
+                  [routerLink]="child.route"
+                  routerLinkActive="bg-purple-100 text-purple-700 border-l-purple-400"
+                  class="flex items-center px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors border-l-2 border-transparent"
+                >
+                  <ion-icon
+                    [name]="child.icon"
+                    class="mr-3 text-base"
+                  ></ion-icon>
+                  <span class="text-sm">{{ child.title }}</span>
+                </a>
+              </div>
+            </ng-template>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-gray-200">
+      <div
+        class="bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg p-4 text-white"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="shield-checkmark-outline"
+            class="text-2xl mr-3"
+          ></ion-icon>
+          <div>
+            <p class="text-sm font-medium">System Status</p>
+            <p class="text-xs opacity-90">All systems operational</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div
+    *ngIf="isSidebarOpen"
+    (click)="closeSidebar()"
+    class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+  ></div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden lg:ml-0">
+    <!-- Top Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+      <div class="flex items-center justify-between px-6 py-4">
+        <div class="flex items-center space-x-4">
+          <!-- Mobile Menu Button -->
+          <button
+            (click)="toggleSidebar()"
+            class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <ion-icon name="menu-outline" class="text-xl"></ion-icon>
+          </button>
+
+          <!-- Breadcrumbs -->
+          <nav class="flex items-center space-x-2 text-sm">
+            <span class="text-gray-500">Super Admin</span>
+            <ion-icon
+              name="chevron-forward-outline"
+              class="text-gray-400 text-xs"
+              *ngFor="let crumb of getBreadcrumbs(); let last = last"
+            ></ion-icon>
+            <span
+              *ngFor="let crumb of getBreadcrumbs(); let last = last"
+              [class.text-gray-900]="last"
+              [class.font-medium]="last"
+              [class.text-gray-500]="!last"
+            >
+              {{ crumb }}
+            </span>
+          </nav>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center space-x-4">
+          <!-- Search -->
+          <div class="hidden md:block relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
+            </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              class="block w-64 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+
+          <!-- Notifications -->
+          <!-- <button
+            class="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ion-icon name="notifications-outline" class="text-xl"></ion-icon>
+            <span
+              class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"
+            ></span>
+          </button> -->
+
+          <!-- System Health Indicator -->
+          <div
+            class="hidden sm:flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+          >
+            <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+            <span class="font-medium">System Healthy</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="flex-1 overflow-y-auto bg-gray-50">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,1 +1,353 @@
-<p>super-admin-dashboard works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Super Admin Dashboard</h1>
+      <p class="text-gray-600 mt-1">
+        Welcome back, {{ currentUser?.fullName }}. Monitor and manage your
+        banking ecosystem.
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+      <button
+        (click)="refreshDashboard()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+      <span class="text-sm text-gray-500">
+        Last updated: {{ lastUpdated | date : "short" }}
+      </span>
+    </div>
+  </div>
+
+  <!-- System Health Status -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+        <ion-icon name="pulse-outline" class="mr-2 text-blue-600"></ion-icon>
+        System Health
+      </h2>
+      <span
+        class="inline-flex px-3 py-1 text-sm font-semibold rounded-full"
+        [ngClass]="getSystemHealthClass()"
+      >
+        {{ dashboardStats.systemHealth.status }}
+      </span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="text-center p-4 bg-gray-50 rounded-lg">
+        <ion-icon
+          name="trending-up-outline"
+          class="text-green-600 text-2xl mb-2"
+        ></ion-icon>
+        <p class="text-sm text-gray-600">System Uptime</p>
+        <p class="text-lg font-semibold text-gray-900">
+          {{ dashboardStats.systemHealth.uptime }}
+        </p>
+      </div>
+      <div class="text-center p-4 bg-gray-50 rounded-lg">
+        <ion-icon
+          name="cloud-outline"
+          class="text-blue-600 text-2xl mb-2"
+        ></ion-icon>
+        <p class="text-sm text-gray-600">Last Backup</p>
+        <p class="text-lg font-semibold text-gray-900">
+          {{ dashboardStats.systemHealth.lastBackup | date : "short" }}
+        </p>
+      </div>
+      <div class="text-center p-4 bg-gray-50 rounded-lg">
+        <ion-icon
+          name="shield-checkmark-outline"
+          class="text-green-600 text-2xl mb-2"
+        ></ion-icon>
+        <p class="text-sm text-gray-600">Security Status</p>
+        <p class="text-lg font-semibold text-green-700">Secure</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+    *ngIf="!isLoading; else loadingStats"
+  >
+    <!-- Total Banks -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon
+            name="business-outline"
+            class="text-blue-600 text-2xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Banks</p>
+          <p class="text-3xl font-bold text-gray-900">
+            {{ dashboardStats.totalBanks }}
+          </p>
+          <p class="text-sm text-green-600 flex items-center mt-1">
+            <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
+            +12% from last month
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Clients -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon
+            name="people-outline"
+            class="text-green-600 text-2xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Clients</p>
+          <p class="text-3xl font-bold text-gray-900">
+            {{ dashboardStats.totalClients | number }}
+          </p>
+          <p class="text-sm text-green-600 flex items-center mt-1">
+            <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
+            +8% from last month
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Users -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <ion-icon
+            name="person-outline"
+            class="text-purple-600 text-2xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Users</p>
+          <p class="text-3xl font-bold text-gray-900">
+            {{ dashboardStats.totalUsers | number }}
+          </p>
+          <p class="text-sm text-green-600 flex items-center mt-1">
+            <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
+            +15% from last month
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Payments -->
+    <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-3 rounded-lg">
+          <ion-icon
+            name="card-outline"
+            class="text-orange-600 text-2xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Payments</p>
+          <p class="text-3xl font-bold text-gray-900">
+            {{ dashboardStats.totalPayments | number }}
+          </p>
+          <p class="text-sm text-green-600 flex items-center mt-1">
+            <ion-icon name="trending-up" class="text-xs mr-1"></ion-icon>
+            +25% from last month
+          </p>
+        </div>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- Loading Stats Template -->
+  <ng-template #loadingStats>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div
+        *ngFor="let i of [1, 2, 3, 4]"
+        class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+      >
+        <div class="animate-pulse">
+          <div class="flex items-center">
+            <div class="bg-gray-200 w-12 h-12 rounded-lg"></div>
+            <div class="ml-4 flex-1">
+              <div class="bg-gray-200 h-4 rounded w-24 mb-2"></div>
+              <div class="bg-gray-200 h-8 rounded w-16 mb-1"></div>
+              <div class="bg-gray-200 h-3 rounded w-20"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <!-- Quick Actions -->
+    <div
+      class="xl:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+    >
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+          <ion-icon name="flash-outline" class="mr-2 text-blue-600"></ion-icon>
+          Quick Actions
+        </h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a
+          *ngFor="let action of quickActions"
+          [routerLink]="action.route"
+          class="flex items-center p-4 border rounded-lg transition-colors cursor-pointer"
+          [ngClass]="getQuickActionColorClass(action.color)"
+        >
+          <div class="flex-shrink-0 mr-4">
+            <ion-icon [name]="action.icon" class="text-2xl"></ion-icon>
+          </div>
+          <div>
+            <h3 class="font-medium">{{ action.title }}</h3>
+            <p class="text-sm opacity-80">{{ action.description }}</p>
+          </div>
+          <div class="ml-auto">
+            <ion-icon name="chevron-forward-outline" class="text-lg"></ion-icon>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+          <ion-icon name="time-outline" class="mr-2 text-blue-600"></ion-icon>
+          Recent Activity
+        </h2>
+        <a
+          routerLink="/super-admin/system-logs"
+          class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+        >
+          View All →
+        </a>
+      </div>
+      <div class="space-y-4">
+        <div
+          *ngFor="let activity of recentActivities"
+          class="flex items-start p-3 bg-gray-50 rounded-lg"
+        >
+          <div class="flex-shrink-0 mr-3">
+            <div class="bg-blue-100 p-2 rounded-full">
+              <ion-icon
+                [name]="getActivityIcon(activity.type)"
+                class="text-blue-600 text-sm"
+              ></ion-icon>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900">
+              {{ activity.title }}
+            </p>
+            <p class="text-sm text-gray-600">{{ activity.description }}</p>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ getRelativeTime(activity.timestamp) }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Banks -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+    *ngIf="dashboardStats.recentBanks.length > 0"
+  >
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+        <ion-icon name="business-outline" class="mr-2 text-blue-600"></ion-icon>
+        Recently Added Banks
+      </h2>
+      <a
+        routerLink="/super-admin/banks"
+        class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+      >
+        View All Banks →
+      </a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead class="bg-gray-50 rounded-lg">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Bank Details
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Admin
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Statistics
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr
+            *ngFor="let bank of dashboardStats.recentBanks"
+            class="hover:bg-gray-50"
+          >
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div
+                    class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
+                  >
+                    <span class="text-sm font-medium text-white">
+                      <ion-icon name="business-outline"></ion-icon>
+                      <!-- {{ getBankInitials(bank.name) }} -->
+                    </span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ bank.name }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ bank.contactEmail }}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ bank.adminUsername }}</div>
+              <div class="text-sm text-gray-500">ID: {{ bank.adminId }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <div>{{ bank.totalClients }} clients</div>
+              <div>{{ bank.totalUsers }} users</div>
+            </td>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"
+            >
+              <a
+                [routerLink]="['/super-admin/banks', bank.id]"
+                class="text-blue-600 hover:text-blue-900 transition-colors"
+              >
+                <ion-icon name="eye-outline"></ion-icon>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

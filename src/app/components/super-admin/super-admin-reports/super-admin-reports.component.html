@@ -1,1 +1,408 @@
-<p>super-admin-reports works!</p>
+<div class="p-6 space-y-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">System Reports</h1>
+      <p class="text-gray-600 mt-1">
+        Generate and manage system-wide reports and analytics
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+      <button
+        (click)="loadReports()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6" *ngIf="statistics">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon
+            name="document-text-outline"
+            class="text-blue-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Reports</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ statistics.totalReports }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon
+            name="analytics-outline"
+            class="text-green-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">System Reports</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ statistics.reportsByType["system_overview"] || 0 }}
+          </p>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <ion-icon
+            name="business-outline"
+            class="text-purple-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Bank Reports</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ statistics.reportsByType["bank_performance"] || 0 }}
+          </p>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-3 rounded-lg">
+          <ion-icon
+            name="shield-checkmark-outline"
+            class="text-orange-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Audit Reports</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ statistics.reportsByType["security_audit"] || 0 }}
+          </p>
+        </div>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- Quick Report Generation -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+        <ion-icon name="flash-outline" class="mr-2 text-blue-600"></ion-icon>
+        Quick Report Generation
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div
+        *ngFor="let report of quickReports"
+        class="flex flex-col p-4 border rounded-lg cursor-pointer transition-all duration-200"
+        [ngClass]="getQuickReportColorClass(report.color)"
+        (click)="generateReport(report.type)"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <ion-icon [name]="report.icon" class="text-2xl"></ion-icon>
+          <span class="text-xs px-2 py-1 bg-white rounded-full opacity-75">
+            {{ report.estimatedTime }}
+          </span>
+        </div>
+        <h3 class="font-semibold mb-2">{{ report.title }}</h3>
+        <p class="text-sm opacity-80 flex-1">{{ report.description }}</p>
+        <div class="mt-4 pt-3 border-t border-current border-opacity-20">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium">Generate Report</span>
+            <ion-icon name="arrow-forward-outline" class="text-sm"></ion-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <!-- <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <ion-icon name="funnel-outline" class="mr-2 text-blue-600"></ion-icon>
+      Filter Reports
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Date Range</label
+        >
+        <select
+          [(ngModel)]="filters.dateRange"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option *ngFor="let range of dateRanges" [value]="range.value">
+            {{ range.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Report Type</label
+        >
+        <select
+          [(ngModel)]="filters.reportType"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option *ngFor="let type of reportTypes" [value]="type.value">
+            {{ type.label }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Bank</label>
+        <select
+          [(ngModel)]="filters.bankId"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">All Banks</option>
+          <option *ngFor="let bank of banks" [value]="bank.id">
+            {{ bank.name }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Status</label
+        >
+        <select
+          [(ngModel)]="filters.status"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="all">All Status</option>
+          <option value="completed">Completed</option>
+          <option value="generating">Generating</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Reports List -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">
+          Generated Reports ({{ getFilteredReports().length }})
+        </h2>
+        <div *ngIf="isGenerating" class="flex items-center text-orange-600">
+          <div
+            class="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600 mr-2"
+          ></div>
+          <span class="text-sm font-medium">Generating report...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <table
+        class="min-w-full"
+        *ngIf="getFilteredReports().length > 0; else noReportsTemplate"
+      >
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Report Details
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Generated
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              File Info
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            *ngFor="let report of getFilteredReports()"
+            class="hover:bg-gray-50"
+          >
+            <!-- Report Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="bg-blue-100 p-2 rounded-lg">
+                    <ion-icon
+                      [name]="getReportIcon(report.type)"
+                      class="text-blue-600"
+                    ></ion-icon>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ getReportTypeLabel(report.type) }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    Report ID: #{{ report.id }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Generated -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                {{ report.generatedAt | date : "medium" }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ getRelativeTime(report.generatedAt) }}
+              </div>
+            </td>
+
+            <!-- Status -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                [ngClass]="getStatusBadgeClass(report.status || 'completed')"
+              >
+                {{ report.status || "completed" | titlecase }}
+              </span>
+            </td>
+
+            <!-- File Info -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <div>Size: {{ report.size || "N/A" }}</div>
+              <div class="flex items-center">
+                <ion-icon
+                  name="download-outline"
+                  class="text-xs mr-1"
+                ></ion-icon>
+                {{ report.downloadCount || 0 }} downloads
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td
+              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+            >
+              <div class="flex items-center space-x-2">
+                <button
+                  (click)="downloadReport(report.id)"
+                  [disabled]="report.status === 'generating'"
+                  class="text-blue-600 hover:text-blue-900 disabled:text-gray-400 transition-colors"
+                  title="Download Report"
+                >
+                  <ion-icon name="download-outline"></ion-icon>
+                </button>
+                <button
+                  (click)="deleteReport(report.id)"
+                  class="text-red-600 hover:text-red-900 transition-colors"
+                  title="Delete Report"
+                >
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Reports Template -->
+      <ng-template #noReportsTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="document-text-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No reports found
+          </h3>
+          <p class="text-gray-500 mb-6">
+            Generate your first system report using the quick actions above.
+          </p>
+          <button
+            (click)="generateReport('system_overview')"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <ion-icon name="add" class="mr-2"></ion-icon>
+            Generate System Overview
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading reports...</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Recent Reports Summary -->
+  <!-- *ngIf="statistics?.recentReports && statistics?.recentReports?.length > 0" -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+    *ngIf="statistics?.recentReports"
+  >
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <ion-icon name="time-outline" class="mr-2 text-blue-600"></ion-icon>
+      Recent Activity
+    </h2>
+    <div class="space-y-3">
+      <div
+        *ngFor="let recent of statistics?.recentReports"
+        class="flex items-center p-3 bg-gray-50 rounded-lg"
+      >
+        <div class="flex-shrink-0 mr-3">
+          <div class="bg-green-100 p-2 rounded-full">
+            <ion-icon
+              [name]="getReportIcon(recent.type)"
+              class="text-green-600 text-sm"
+            ></ion-icon>
+          </div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-900">
+            {{ getReportTypeLabel(recent.type) }}
+          </p>
+          <p class="text-sm text-gray-600">Report ID: #{{ recent.id }}</p>
+          <p class="text-xs text-gray-500">
+            {{ getRelativeTime(recent.generatedAt) }}
+          </p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button
+            (click)="downloadReport(recent.id)"
+            class="text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <ion-icon name="download-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

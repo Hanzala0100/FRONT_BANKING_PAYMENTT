@@ -1,1 +1,470 @@
-<p>create-bank works!</p>
+<!-- components/super-admin/bank-management/create-bank/create-bank.component.html -->
+<div class="p-6 max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4 mb-4">
+      <a
+        routerLink="/super-admin/banks"
+        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          class="text-lg text-gray-600"
+        ></ion-icon>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Add New Bank</h1>
+        <p class="text-gray-600">Onboard a new banking partner to the system</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+    <div class="flex items-center justify-between">
+      <div
+        *ngFor="let step of [1, 2, 3]; let i = index"
+        class="flex items-center"
+      >
+        <!-- Step Circle -->
+        <div
+          class="flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold"
+          [class.bg-blue-600]="step <= currentStep"
+          [class.text-white]="step <= currentStep"
+          [class.bg-gray-200]="step > currentStep"
+          [class.text-gray-600]="step > currentStep"
+        >
+          <span *ngIf="step < currentStep">
+            <ion-icon name="checkmark-outline"></ion-icon>
+          </span>
+          <span *ngIf="step >= currentStep">{{ step }}</span>
+        </div>
+
+        <!-- Step Info -->
+        <div class="ml-4" *ngIf="step === currentStep">
+          <p class="text-sm font-medium text-gray-900">
+            {{ getStepTitle(step) }}
+          </p>
+          <p class="text-sm text-gray-500">{{ getStepDescription(step) }}</p>
+        </div>
+
+        <!-- Connector Line -->
+        <div
+          *ngIf="i < 2"
+          class="w-20 h-px mx-4"
+          [class.bg-blue-600]="step < currentStep"
+          [class.bg-gray-200]="step >= currentStep"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <form [formGroup]="bankForm" (ngSubmit)="onSubmit()">
+      <!-- Step 1: Bank Information -->
+      <div *ngIf="currentStep === 1" class="space-y-6">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <ion-icon
+              name="business-outline"
+              class="mr-2 text-blue-600"
+            ></ion-icon>
+            Bank Information
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Enter the basic information about the banking institution
+          </p>
+        </div>
+
+        <!-- Bank Name -->
+        <div>
+          <label
+            for="name"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Bank Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            placeholder="e.g., State Bank of India"
+            class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            [class.border-red-300]="isFieldInvalid('name')"
+          />
+          <div
+            *ngIf="isFieldInvalid('name')"
+            class="text-red-600 text-sm mt-1 flex items-center"
+          >
+            <ion-icon
+              name="alert-circle-outline"
+              class="mr-1 text-sm"
+            ></ion-icon>
+            {{ getErrorMessage("name") }}
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div>
+          <label
+            for="address"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Registered Address <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            id="address"
+            formControlName="address"
+            rows="4"
+            placeholder="Enter complete registered address including city, state, and postal code"
+            class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+            [class.border-red-300]="isFieldInvalid('address')"
+          >
+          </textarea>
+          <div
+            *ngIf="isFieldInvalid('address')"
+            class="text-red-600 text-sm mt-1 flex items-center"
+          >
+            <ion-icon
+              name="alert-circle-outline"
+              class="mr-1 text-sm"
+            ></ion-icon>
+            {{ getErrorMessage("address") }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Contact Information -->
+      <div *ngIf="currentStep === 2" class="space-y-6">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <ion-icon name="mail-outline" class="mr-2 text-blue-600"></ion-icon>
+            Contact Information
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Provide official contact details for the bank
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Contact Email -->
+          <div>
+            <label
+              for="contactEmail"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Official Email Address <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="contactEmail"
+              formControlName="contactEmail"
+              placeholder="info@bankname.com"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('contactEmail')"
+            />
+            <div
+              *ngIf="isFieldInvalid('contactEmail')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("contactEmail") }}
+            </div>
+          </div>
+
+          <!-- Contact Phone -->
+          <div>
+            <label
+              for="contactPhone"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Contact Phone Number <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              id="contactPhone"
+              formControlName="contactPhone"
+              placeholder="+1 (555) 123-4567"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('contactPhone')"
+            />
+            <div
+              *ngIf="isFieldInvalid('contactPhone')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("contactPhone") }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Administrator Setup -->
+      <div *ngIf="currentStep === 3" class="space-y-6">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <ion-icon
+              name="person-outline"
+              class="mr-2 text-blue-600"
+            ></ion-icon>
+            Administrator Setup
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Create the bank administrator account for system management
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Admin Username -->
+          <div>
+            <label
+              for="adminUsername"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Username <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="adminUsername"
+              formControlName="adminUsername"
+              placeholder="admin_bankname"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('adminUsername')"
+            />
+            <div
+              *ngIf="isFieldInvalid('adminUsername')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("adminUsername") }}
+            </div>
+          </div>
+
+          <!-- Admin Full Name -->
+          <div>
+            <label
+              for="adminFullName"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Full Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="adminFullName"
+              formControlName="adminFullName"
+              placeholder="John Smith"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('adminFullName')"
+            />
+            <div
+              *ngIf="isFieldInvalid('adminFullName')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("adminFullName") }}
+            </div>
+          </div>
+
+          <!-- Admin Email -->
+          <div>
+            <label
+              for="adminEmail"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Email Address <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="adminEmail"
+              formControlName="adminEmail"
+              placeholder="admin@bankname.com"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('adminEmail')"
+            />
+            <div
+              *ngIf="isFieldInvalid('adminEmail')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("adminEmail") }}
+            </div>
+          </div>
+
+          <!-- Admin Password -->
+          <div>
+            <label
+              for="adminPassword"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Password <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              id="adminPassword"
+              formControlName="adminPassword"
+              placeholder="Enter secure password"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('adminPassword')"
+            />
+            <div
+              *ngIf="isFieldInvalid('adminPassword')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("adminPassword") }}
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="md:col-span-2">
+            <label
+              for="confirmPassword"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Confirm Password <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              placeholder="Confirm password"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('confirmPassword')"
+            />
+            <div
+              *ngIf="isFieldInvalid('confirmPassword')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              {{ getErrorMessage("confirmPassword") }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start">
+            <ion-icon
+              name="information-circle"
+              class="text-blue-600 text-xl mr-3 mt-0.5"
+            ></ion-icon>
+            <div>
+              <h3 class="text-sm font-medium text-blue-900 mb-1">
+                Administrator Account Security
+              </h3>
+              <ul class="text-sm text-blue-800 space-y-1">
+                <li>
+                  • The administrator will have full access to manage bank
+                  operations
+                </li>
+                <li>• Password must be at least 8 characters long</li>
+                <li>
+                  • Administrator can create additional bank user accounts
+                </li>
+                <li>• This account will be used for initial system setup</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        *ngIf="errorMessage"
+        class="bg-red-50 border border-red-200 rounded-lg p-4"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="alert-circle"
+            class="text-red-500 text-lg mr-2"
+          ></ion-icon>
+          <p class="text-red-700 text-sm font-medium">{{ errorMessage }}</p>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div
+        *ngIf="successMessage"
+        class="bg-green-50 border border-green-200 rounded-lg p-4"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="checkmark-circle"
+            class="text-green-500 text-lg mr-2"
+          ></ion-icon>
+          <p class="text-green-700 text-sm font-medium">{{ successMessage }}</p>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+
+      <!-- Navigation Buttons -->
+      <div class="flex items-center justify-between mt-8">
+        <!-- Previous Button -->
+        <button
+          type="button"
+          class="px-6 py-3 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50"
+          (click)="previousStep()"
+          [disabled]="currentStep === 1"
+        >
+          <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon>
+          Previous
+        </button>
+
+        <!-- Next / Submit -->
+        <div>
+          <button
+            *ngIf="currentStep < totalSteps"
+            type="button"
+            class="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            (click)="nextStep()"
+          >
+            Next
+            <ion-icon name="arrow-forward-outline" class="ml-2"></ion-icon>
+          </button>
+
+          <button
+            *ngIf="currentStep === totalSteps"
+            type="submit"
+            class="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center"
+            [disabled]="isLoading"
+          >
+            <ng-container *ngIf="!isLoading">
+              <ion-icon name="save-outline" class="mr-2"></ion-icon>
+              Create Bank
+            </ng-container>
+            <ng-container *ngIf="isLoading">
+              <ion-icon
+                name="sync-outline"
+                class="mr-2 animate-spin"
+              ></ion-icon>
+              Processing...
+            </ng-container>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

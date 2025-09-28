@@ -1,1 +1,405 @@
-<p>bank-list works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Bank Management</h1>
+      <p class="text-gray-600 mt-1">
+        Monitor and manage all registered banking partners
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex items-center space-x-3">
+      <button
+        (click)="refreshData()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+      <a
+        routerLink="/super-admin/banks/create"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="add" class="mr-2"></ion-icon>
+        Add New Bank
+      </a>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon name="business" class="text-blue-600 text-xl"></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Banks</p>
+          <p class="text-2xl font-bold text-gray-900">{{ allBanks.length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon name="people" class="text-green-600 text-xl"></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Clients</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ totalClients | number }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <ion-icon name="person" class="text-purple-600 text-xl"></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Users</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ totalUsers | number }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-3 rounded-lg">
+          <ion-icon name="analytics" class="text-orange-600 text-xl"></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Avg. Clients/Bank</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ averageClientsPerBank }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Search -->
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Search Banks</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Search by name, email, admin username..."
+            class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <!-- Sort -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Sort By</label
+        >
+        <select
+          [(ngModel)]="sortBy"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="name">Bank Name</option>
+          <option value="totalClients">Total Clients</option>
+          <option value="totalUsers">Total Users</option>
+          <option value="adminUsername">Admin Username</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banks Table -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900">
+        Registered Banks ({{ filteredBanks.length }})
+      </h2>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <table
+        class="min-w-full"
+        *ngIf="filteredBanks.length > 0; else noBanksTemplate"
+      >
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              <button
+                (click)="sortBanks('name')"
+                class="flex items-center space-x-1 hover:text-gray-700"
+              >
+                <span>Bank Details</span>
+                <ion-icon
+                  [name]="getSortIcon('name')"
+                  class="text-sm"
+                ></ion-icon>
+              </button>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              <button
+                (click)="sortBanks('adminUsername')"
+                class="flex items-center space-x-1 hover:text-gray-700"
+              >
+                <span>Administrator</span>
+                <ion-icon
+                  [name]="getSortIcon('adminUsername')"
+                  class="text-sm"
+                ></ion-icon>
+              </button>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Contact Information
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              <button
+                (click)="sortBanks('totalClients')"
+                class="flex items-center space-x-1 hover:text-gray-700"
+              >
+                <span>Statistics</span>
+                <ion-icon
+                  [name]="getSortIcon('totalClients')"
+                  class="text-sm"
+                ></ion-icon>
+              </button>
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Performance
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            *ngFor="let bank of filteredBanks; trackBy: trackByBankId"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <!-- Bank Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12">
+                  <div
+                    class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
+                  >
+                    <span class="text-lg font-medium text-white">
+                      <!-- {{ getBankInitials(bank.name) }} -->
+                      <ion-icon name="business-outline"></ion-icon>
+                    </span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ bank.name }}
+                  </div>
+                  <div class="text-sm text-gray-500">ID: {{ bank.id }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Administrator -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 font-medium">
+                {{ bank.adminUsername }}
+              </div>
+              <div class="text-sm text-gray-500">
+                Admin ID: {{ bank.adminId }}
+              </div>
+            </td>
+
+            <!-- Contact Information -->
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900">{{ bank.contactEmail }}</div>
+              <div class="text-sm text-gray-500">{{ bank.contactPhone }}</div>
+              <div class="text-sm text-gray-500 max-w-xs truncate">
+                {{ bank.address }}
+              </div>
+            </td>
+
+            <!-- Statistics -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <div class="space-y-1">
+                <div class="flex items-center">
+                  <ion-icon
+                    name="people-outline"
+                    class="text-xs mr-1"
+                  ></ion-icon>
+                  {{ bank.totalClients }} clients
+                </div>
+                <div class="flex items-center">
+                  <ion-icon
+                    name="person-outline"
+                    class="text-xs mr-1"
+                  ></ion-icon>
+                  {{ bank.totalUsers }} users
+                </div>
+              </div>
+            </td>
+
+            <!-- Performance -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                [ngClass]="getPerformanceIndicator(bank).class"
+              >
+                {{ getPerformanceIndicator(bank).label }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td
+              class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+            >
+              <div class="flex items-center space-x-2">
+                <a
+                  [routerLink]="['/super-admin/banks', bank.id]"
+                  class="text-blue-600 hover:text-blue-900 transition-colors"
+                  title="View Details"
+                >
+                  <ion-icon name="eye-outline"></ion-icon>
+                </a>
+
+                <button
+                  (click)="deleteBank(bank)"
+                  class="text-red-600 hover:text-red-900 transition-colors"
+                  title="Delete Bank"
+                >
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Banks Template -->
+      <ng-template #noBanksTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="business-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No banks found</h3>
+          <p class="text-gray-500 mb-6">
+            Get started by adding your first banking partner.
+          </p>
+          <a
+            routerLink="/super-admin/banks/create"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <ion-icon name="add" class="mr-2"></ion-icon>
+            Add First Bank
+          </a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading banks...</p>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteModal" class="fixed inset-0 z-50 overflow-y-auto">
+  <div
+    class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
+  >
+    <div class="fixed inset-0 transition-opacity" (click)="closeDeleteModal()">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+    >
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div
+            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <ion-icon
+              name="alert-circle-outline"
+              class="text-red-600 text-xl"
+            ></ion-icon>
+          </div>
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+              Delete Bank
+            </h3>
+            <div class="mt-2">
+              <p class="text-sm text-gray-500">
+                Are you sure you want to delete
+                <strong>{{ bankToDelete?.name }}</strong
+                >? This action cannot be undone and will remove all associated
+                data including:
+              </p>
+              <ul class="text-sm text-gray-500 mt-2 list-disc list-inside">
+                <li>{{ bankToDelete?.totalClients }} client companies</li>
+                <li>{{ bankToDelete?.totalUsers }} user accounts</li>
+                <li>All transaction history</li>
+                <li>All reports and documents</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button
+          (click)="confirmDelete()"
+          [disabled]="isDeletingBank"
+          class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+        >
+          <span *ngIf="isDeletingBank" class="mr-2">
+            <div
+              class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+            ></div>
+          </span>
+          {{ isDeletingBank ? "Deleting..." : "Delete Bank" }}
+        </button>
+        <button
+          (click)="closeDeleteModal()"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
