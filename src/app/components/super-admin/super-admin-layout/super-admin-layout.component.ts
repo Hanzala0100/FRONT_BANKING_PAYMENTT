@@ -59,12 +59,13 @@ export class SuperAdminLayoutComponent implements OnInit, OnDestroy {
       title: 'System Reports',
       route: '/super-admin/reports',
       icon: 'document-text-outline'
-    },
-    {
-      title: 'System Logs',
-      route: '/super-admin/system-logs',
-      icon: 'list-circle-outline'
     }
+    // ,
+    // {
+    //   title: 'System Logs',
+    //   route: '/super-admin/system-logs',
+    //   icon: 'list-circle-outline'
+    // }
   ];
 
   constructor(

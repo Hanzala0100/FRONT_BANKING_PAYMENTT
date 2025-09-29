@@ -66,14 +66,16 @@ export class SuperAdminDashboardComponent implements OnInit {
       icon: 'document-text-outline',
       route: '/super-admin/reports',
       color: 'purple'
-    },
-    {
-      title: 'System Logs',
-      description: 'Monitor system activities',
-      icon: 'list-outline',
-      route: '/super-admin/system-logs',
-      color: 'orange'
     }
+    
+    // ,
+    // {
+    //   title: 'System Logs',
+    //   description: 'Monitor system activities',
+    //   icon: 'list-outline',
+    //   route: '/super-admin/system-logs',
+    //   color: 'orange'
+    // }
   ];
 
   recentActivities = [

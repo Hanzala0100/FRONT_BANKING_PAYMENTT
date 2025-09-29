@@ -186,6 +186,8 @@ export class SuperAdminReportsComponent implements OnInit {
   }
 
   getRelativeTime(timestamp: string): string {
+
+    
     const now = new Date();
     const time = new Date(timestamp);
     const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
