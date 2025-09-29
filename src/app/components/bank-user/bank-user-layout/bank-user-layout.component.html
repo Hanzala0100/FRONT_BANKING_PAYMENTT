@@ -1,1 +1,213 @@
-<p>bank-user-layout works!</p>
+<div class="flex h-screen bg-gray-50">
+  <!-- Sidebar -->
+  <aside
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
+    [class.translate-x-0]="isSidebarOpen"
+    [class.-translate-x-full]="!isSidebarOpen"
+  >
+    <!-- Sidebar Header -->
+    <div
+      class="flex items-center justify-between h-16 px-6 border-b border-gray-200"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-lg"
+        >
+          <ion-icon
+            name="business-outline"
+            class="text-white text-lg"
+          ></ion-icon>
+        </div>
+        <span class="text-lg font-bold text-gray-900">Bank Portal</span>
+      </div>
+      <button
+        (click)="closeSidebar()"
+        class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+      >
+        <ion-icon name="close-outline" class="text-xl"></ion-icon>
+      </button>
+    </div>
+
+    <!-- User Info -->
+    <div
+      class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-cyan-50"
+    >
+      <div class="flex items-center space-x-3">
+        <div
+          class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+        >
+          <span class="text-white text-lg font-semibold">
+            {{ getUserInitials(currentUser?.fullName) }}
+          </span>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-gray-900">
+            {{ currentUser?.fullName }}
+          </p>
+          <p class="text-xs text-gray-600">{{ currentUser?.email }}</p>
+          <span
+            class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mt-1"
+          >
+            Bank Administrator
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-4 py-6 overflow-y-auto">
+      <ul class="space-y-2">
+        <li *ngFor="let item of navigationItems">
+          <!-- Menu Item -->
+          <div>
+            <!-- Main Menu Item -->
+            <a
+              *ngIf="!item.children; else menuWithChildren"
+              [routerLink]="item.route"
+              routerLinkActive="bg-blue-100 text-blue-700 border-blue-200"
+              class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-transparent"
+            >
+              <ion-icon [name]="item.icon" class="mr-3 text-lg"></ion-icon>
+              <span class="font-medium">{{ item.name }}</span>
+              <span
+                *ngIf="item.badge"
+                class="ml-auto bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded-full"
+              >
+                {{ item.badge }}
+              </span>
+            </a>
+
+            <!-- Menu Item with Children -->
+            <ng-template #menuWithChildren>
+              <button
+                (click)="toggleMenuItem(item)"
+                class="w-full flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                [class.bg-blue-50]="isParentActive(item)"
+                [class.text-blue-700]="isParentActive(item)"
+              >
+                <ion-icon [name]="item.icon" class="mr-3 text-lg"></ion-icon>
+                <span class="font-medium">{{ item.name }}</span>
+                <ion-icon
+                  name="chevron-down-outline"
+                  class="ml-auto text-sm transition-transform duration-200"
+                  [class.rotate-180]="item.isExpanded"
+                >
+                </ion-icon>
+              </button>
+
+              <!-- Submenu -->
+              <div *ngIf="item.isExpanded" class="ml-6 mt-2 space-y-1">
+                <a
+                  *ngFor="let child of item.children"
+                  [routerLink]="child.route"
+                  routerLinkActive="bg-blue-100 text-blue-700 border-l-blue-400"
+                  class="flex items-center px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors border-l-2 border-transparent"
+                >
+                  <ion-icon
+                    [name]="child.icon"
+                    class="mr-3 text-base"
+                  ></ion-icon>
+                  <span class="text-sm">{{ child.name }}</span>
+                </a>
+              </div>
+            </ng-template>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-gray-200">
+      <button
+        (click)="logout()"
+        class="w-full flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors"
+      >
+        <ion-icon name="log-out-outline" class="mr-3 text-lg"></ion-icon>
+        <span class="font-medium">Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div
+    *ngIf="isSidebarOpen"
+    (click)="closeSidebar()"
+    class="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+  ></div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden lg:ml-0">
+    <!-- Top Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+      <div class="flex items-center justify-between px-6 py-4">
+        <div class="flex items-center space-x-4">
+          <!-- Mobile Menu Button -->
+          <button
+            (click)="toggleSidebar()"
+            class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          >
+            <ion-icon name="menu-outline" class="text-xl"></ion-icon>
+          </button>
+
+          <!-- Breadcrumbs -->
+          <nav class="flex items-center space-x-2 text-sm">
+            <span class="text-gray-500">Bank Portal</span>
+            <ion-icon
+              name="chevron-forward-outline"
+              class="text-gray-400 text-xs"
+              *ngFor="let crumb of getBreadcrumbs(); let last = last"
+            ></ion-icon>
+            <span
+              *ngFor="let crumb of getBreadcrumbs(); let last = last"
+              [class.text-gray-900]="last"
+              [class.font-medium]="last"
+              [class.text-gray-500]="!last"
+            >
+              {{ crumb }}
+            </span>
+          </nav>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center space-x-4">
+          <!-- Search -->
+          <div class="hidden md:block relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
+            </div>
+            <input
+              type="text"
+              placeholder="Search..."
+              class="block w-64 pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <!-- Notifications -->
+          <button
+            class="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ion-icon name="notifications-outline" class="text-xl"></ion-icon>
+            <span
+              class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"
+            ></span>
+          </button>
+
+          <!-- Bank Info -->
+          <div
+            class="hidden sm:flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+          >
+            <ion-icon name="business-outline" class="text-base mr-2"></ion-icon>
+            <span class="font-medium">{{ currentUser?.bankName }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="flex-1 overflow-y-auto bg-gray-50">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

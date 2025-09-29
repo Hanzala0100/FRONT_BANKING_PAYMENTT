@@ -1,4 +1,3 @@
-// components/bank-user/client-management/client-verification/client-verification.component.ts
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -31,7 +30,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
       <div class="bg-white rounded-xl shadow-sm border border-gray-100">
         <div class="border-b border-gray-200">
           <nav class="flex space-x-8 px-6">
-            <button *ngFor="let filter of filters" 
+            <button *ngFor="let filter of filters"
                     (click)="activeFilter = filter.id; applyFilter()"
                     class="py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                     [class.border-blue-500]="activeFilter === filter.id"
@@ -52,24 +51,24 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
 
       <!-- Clients List -->
       <div class="space-y-4" *ngIf="filteredClients.length > 0; else noClientsTemplate">
-        <div *ngFor="let client of filteredClients" 
+        <div *ngFor="let client of filteredClients"
              class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          
+
           <!-- Client Header -->
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-4">
               <div class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
                 <span class="text-lg font-medium text-white">
-                  {{ getClientInitials(client.name) }}
+                  {{ getClientInitials(client.clientName) }}
                 </span>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-900">{{ client.name }}</h3>
-                <p class="text-sm text-gray-600">{{ client.registrationNumber }}</p>
+                <h3 class="text-lg font-semibold text-gray-900">{{ client.clientName }}</h3>
+                <p class="text-sm text-gray-600">{{ client.registerationNumber }}</p>
                 <p class="text-xs text-gray-500">{{ client.address }}</p>
               </div>
             </div>
-            
+
             <div class="text-right">
               <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full"
                     [ngClass]="getStatusBadgeClass(client.verificationStatus)">
@@ -96,13 +95,13 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
           </div>
 
           <!-- Documents Section -->
-          <div class="mb-4" *ngIf="getClientDocuments(client.id).length > 0">
+          <div class="mb-4" *ngIf="getClientDocuments(client.clientId).length > 0">
             <h4 class="text-sm font-medium text-gray-900 mb-2 flex items-center">
               <ion-icon name="document-text-outline" class="mr-2 text-blue-600"></ion-icon>
-              Documents ({{ getClientDocuments(client.id).length }})
+              Documents ({{ getClientDocuments(client.clientId).length }})
             </h4>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <div *ngFor="let doc of getClientDocuments(client.id)" 
+              <div *ngFor="let doc of getClientDocuments(client.clientId)"
                    class="flex items-center p-2 bg-blue-50 rounded-lg border border-blue-200">
                 <ion-icon name="document-outline" class="text-blue-600 mr-2"></ion-icon>
                 <div class="min-w-0 flex-1">
@@ -118,9 +117,9 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
 
           <!-- Verification Actions -->
           <div *ngIf="client.verificationStatus === 'Pending'" class="border-t border-gray-200 pt-4">
-            
+
             <!-- Verification Form -->
-            <div *ngIf="selectedClientId === client.id" class="space-y-4">
+            <div *ngIf="selectedClientId === client.clientId" class="space-y-4">
               <form [formGroup]="verificationForm" (ngSubmit)="submitVerification(client)" class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -128,15 +127,15 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                   </label>
                   <div class="flex space-x-4">
                     <label class="flex items-center">
-                      <input type="radio" 
-                             formControlName="verificationStatus" 
+                      <input type="radio"
+                             formControlName="verificationStatus"
                              value="Verified"
                              class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300">
                       <span class="ml-2 text-sm text-gray-900">Approve</span>
                     </label>
                     <label class="flex items-center">
-                      <input type="radio" 
-                             formControlName="verificationStatus" 
+                      <input type="radio"
+                             formControlName="verificationStatus"
                              value="Rejected"
                              class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300">
                       <span class="ml-2 text-sm text-gray-900">Reject</span>
@@ -148,7 +147,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                   <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
                     Verification Notes <span class="text-red-500">*</span>
                   </label>
-                  <textarea 
+                  <textarea
                     id="notes"
                     formControlName="notes"
                     rows="3"
@@ -156,7 +155,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                     class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     [class.border-red-300]="verificationForm.get('notes')?.invalid && verificationForm.get('notes')?.touched">
                   </textarea>
-                  <div *ngIf="verificationForm.get('notes')?.invalid && verificationForm.get('notes')?.touched" 
+                  <div *ngIf="verificationForm.get('notes')?.invalid && verificationForm.get('notes')?.touched"
                        class="text-red-600 text-sm mt-1 flex items-center">
                     <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
                     Verification notes are required
@@ -164,13 +163,13 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                 </div>
 
                 <div class="flex items-center justify-end space-x-3">
-                  <button type="button" 
+                  <button type="button"
                           (click)="cancelVerification()"
                           class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
                     Cancel
                   </button>
-                  
-                  <button type="submit" 
+
+                  <button type="submit"
                           [disabled]="verificationForm.invalid || isSubmitting"
                           class="px-6 py-2 font-medium rounded-lg transition-colors flex items-center"
                           [class.bg-green-600]="verificationForm.get('verificationStatus')?.value === 'Verified'"
@@ -179,13 +178,13 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                           [class.hover:bg-red-700]="verificationForm.get('verificationStatus')?.value === 'Rejected'"
                           [class.bg-gray-300]="!verificationForm.get('verificationStatus')?.value"
                           class="text-white disabled:bg-gray-300 disabled:cursor-not-allowed">
-                    
+
                     <div *ngIf="isSubmitting" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    <ion-icon *ngIf="!isSubmitting && verificationForm.get('verificationStatus')?.value === 'Verified'" 
+                    <ion-icon *ngIf="!isSubmitting && verificationForm.get('verificationStatus')?.value === 'Verified'"
                               name="checkmark-outline" class="mr-2"></ion-icon>
-                    <ion-icon *ngIf="!isSubmitting && verificationForm.get('verificationStatus')?.value === 'Rejected'" 
+                    <ion-icon *ngIf="!isSubmitting && verificationForm.get('verificationStatus')?.value === 'Rejected'"
                               name="close-outline" class="mr-2"></ion-icon>
-                    
+
                     {{ isSubmitting ? 'Processing...' : 'Submit Verification' }}
                   </button>
                 </div>
@@ -193,14 +192,14 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
             </div>
 
             <!-- Action Buttons -->
-            <div *ngIf="selectedClientId !== client.id" class="flex items-center justify-end space-x-3">
-              <a [routerLink]="['/bank-admin/clients', client.id]" 
+            <div *ngIf="selectedClientId !== client.clientId" class="flex items-center justify-end space-x-3">
+              <a [routerLink]="['/bank-admin/clients', client.clientId]"
                  class="flex items-center px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
                 <ion-icon name="eye-outline" class="mr-2"></ion-icon>
                 View Details
               </a>
-              
-              <button (click)="startVerification(client.id)"
+
+              <button (click)="startVerification(client.clientId)"
                       class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                 <ion-icon name="checkmark-circle-outline" class="mr-2"></ion-icon>
                 Start Verification
@@ -212,10 +211,10 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
           <div *ngIf="client.verificationStatus !== 'Pending'" class="border-t border-gray-200 pt-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center">
-                <ion-icon name="checkmark-circle" 
+                <ion-icon name="checkmark-circle"
                           *ngIf="client.verificationStatus === 'Verified'"
                           class="text-green-500 text-lg mr-2"></ion-icon>
-                <ion-icon name="close-circle" 
+                <ion-icon name="close-circle"
                           *ngIf="client.verificationStatus === 'Rejected'"
                           class="text-red-500 text-lg mr-2"></ion-icon>
                 <div>
@@ -227,8 +226,8 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                   </p>
                 </div>
               </div>
-              
-              <a [routerLink]="['/bank-admin/clients', client.id]" 
+
+              <a [routerLink]="['/bank-admin/clients', client.clientId]"
                  class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 View Details →
               </a>
@@ -247,7 +246,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
           <p class="text-gray-500 mb-6">
             {{ activeFilter === 'pending' ? 'All clients have been verified.' : 'No clients match the selected filter.' }}
           </p>
-          <a routerLink="/bank-admin/clients/create" 
+          <a routerLink="/bank-admin/clients/create"
              *ngIf="activeFilter === 'pending'"
              class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <ion-icon name="add" class="mr-2"></ion-icon>
@@ -336,10 +335,10 @@ export class ClientVerificationComponent implements OnInit {
   loadDocumentsForClients() {
     // Load documents for each client
     this.allClients.forEach(client => {
-      this.bankUserService.getClientDocuments(client.id).subscribe({
+      this.bankUserService.getClientDocuments(client.clientId).subscribe({
         next: (response) => {
           if (response.success) {
-            this.clientDocuments[client.id] = response.data.map((doc: any) => ({
+            this.clientDocuments[client.clientId] = response.data.map((doc: any) => ({
               uploadedBy: doc.uploadedBy,
               bankId: doc.bankId,
               fileName: doc.fileName,
@@ -351,7 +350,7 @@ export class ClientVerificationComponent implements OnInit {
             }));
           }
         },
-        error: (error) => console.error(`Error loading documents for client ${client.id}:`, error)
+        error: (error) => console.error(`Error loading documents for client ${client.clientId}:`, error)
       });
     });
   }
@@ -401,11 +400,11 @@ export class ClientVerificationComponent implements OnInit {
         notes: this.verificationForm.get('notes')?.value
       };
 
-      this.bankUserService.verifyClient(client.id, verificationRequest).subscribe({
+      this.bankUserService.verifyClient(client.clientId, verificationRequest).subscribe({
         next: (response) => {
           if (response.success) {
             // Update the client in the local array
-            const clientIndex = this.allClients.findIndex(c => c.id === client.id);
+            const clientIndex = this.allClients.findIndex(c => c.clientId === client.clientId);
             if (clientIndex >= 0) {
               this.allClients[clientIndex] = response.data;
             }

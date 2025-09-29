@@ -1,1 +1,123 @@
-<p>report-generator works!</p>
+<div class="p-6 max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4 mb-4">
+      <a
+        routerLink="/bank-user/reports"
+        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          class="text-lg text-gray-600"
+        ></ion-icon>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Generate Report</h1>
+        <p class="text-gray-600">
+          Create custom reports for your banking operations
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error/Success Messages -->
+  <div
+    *ngIf="errorMessage"
+    class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center"
+  >
+    <ion-icon
+      name="alert-circle-outline"
+      class="text-red-600 mr-3 text-lg"
+    ></ion-icon>
+    <span class="text-red-800">{{ errorMessage }}</span>
+    <button
+      (click)="errorMessage = ''"
+      class="ml-auto text-red-600 hover:text-red-800"
+    >
+      <ion-icon name="close-outline" class="text-lg"></ion-icon>
+    </button>
+  </div>
+
+  <div
+    *ngIf="successMessage"
+    class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center"
+  >
+    <ion-icon
+      name="checkmark-circle-outline"
+      class="text-green-600 mr-3 text-lg"
+    ></ion-icon>
+    <span class="text-green-800">{{ successMessage }}</span>
+    <button
+      (click)="successMessage = ''"
+      class="ml-auto text-green-600 hover:text-green-800"
+    >
+      <ion-icon name="close-outline" class="text-lg"></ion-icon>
+    </button>
+  </div>
+
+  <!-- Report Form -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <form [formGroup]="reportForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Report Type Selection -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-gray-900">Report Type</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            *ngFor="let type of reportTypes"
+            class="border-2 rounded-lg p-4 cursor-pointer transition-all"
+            [class.border-blue-500]="
+              reportForm.get('reportType')?.value === type.value
+            "
+            [class.border-gray-200]="
+              reportForm.get('reportType')?.value !== type.value
+            "
+            [class.bg-blue-50]="
+              reportForm.get('reportType')?.value === type.value
+            "
+            [class.bg-white]="
+              reportForm.get('reportType')?.value !== type.value
+            "
+            (click)="reportForm.patchValue({ reportType: type.value })"
+          >
+            <div class="flex items-center">
+              <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                <ion-icon [name]="type.icon" class="text-blue-600"></ion-icon>
+              </div>
+              <div>
+                <h4 class="font-medium text-gray-900">{{ type.label }}</h4>
+                <p class="text-sm text-gray-600">
+                  Generate detailed {{ type.label.toLowerCase() }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          *ngIf="isFieldInvalid('reportType')"
+          class="text-red-600 text-sm flex items-center"
+        >
+          <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+          Please select a report type
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div
+        class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-6 border-t border-gray-200"
+      >
+        <button
+          type="submit"
+          class="flex-1 sm:flex-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center"
+          [disabled]="isGenerating || reportForm.invalid"
+        >
+          <ion-icon
+            *ngIf="isGenerating"
+            name="refresh-outline"
+            class="animate-spin mr-2"
+          ></ion-icon>
+          {{ isGenerating ? "Generating Report..." : "Generate Report" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
