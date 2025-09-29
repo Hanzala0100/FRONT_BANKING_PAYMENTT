@@ -35,7 +35,7 @@ export class PaymentHistoryComponent implements OnInit {
 
   loadPayments() {
     this.isLoading = true;
-    this.bankUserService.getPaymentsByStatus('').subscribe({
+    this.bankUserService.getPendingPayments().subscribe({
       next: (response) => {
         if (response.success) {
           this.allPayments = response.data;

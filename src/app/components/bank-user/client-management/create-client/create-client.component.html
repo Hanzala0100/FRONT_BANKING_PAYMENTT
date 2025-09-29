@@ -159,6 +159,115 @@
         </div>
       </div>
 
+      <!-- Document Upload Section -->
+      <div class="space-y-6">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <ion-icon
+              name="document-text-outline"
+              class="mr-2 text-blue-600"
+            ></ion-icon>
+            Client Documents (Optional)
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Upload required documents for verification (PDF, JPEG, PNG, Word -
+            Max 10MB each)
+          </p>
+        </div>
+
+        <!-- Document Type Selection -->
+        <!-- Document Type Selection -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Document Type
+          </label>
+          <select
+            formControlName="documentType"
+            class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option *ngFor="let type of documentTypes" [value]="type">
+              {{ type }}
+            </option>
+          </select>
+        </div>
+
+        <!-- File Upload Area -->
+        <div
+          class="file-upload p-8 text-center"
+          [class.dragover]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+        >
+          <input
+            type="file"
+            #fileInput
+            multiple
+            (change)="onFileSelected($event)"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            class="hidden"
+          />
+
+          <div class="max-w-md mx-auto">
+            <ion-icon
+              name="cloud-upload-outline"
+              class="text-4xl text-gray-400 mb-4"
+            ></ion-icon>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">
+              Upload Documents
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">
+              Drag & drop files here or click to browse
+            </p>
+            <button
+              type="button"
+              (click)="fileInput.click()"
+              class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            >
+              <ion-icon name="folder-open-outline" class="mr-2"></ion-icon>
+              Select Files
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected Files List -->
+        <div *ngIf="selectedFiles.length > 0" class="space-y-3">
+          <h4 class="text-sm font-medium text-gray-900">
+            Selected Files ({{ selectedFiles.length }})
+          </h4>
+          <div class="space-y-2 max-h-60 overflow-y-auto">
+            <div
+              *ngFor="let file of selectedFiles; let i = index"
+              class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+            >
+              <div class="flex items-center space-x-3">
+                <div class="bg-blue-100 p-2 rounded-lg">
+                  <ion-icon
+                    [name]="getFileIcon(file.type)"
+                    class="text-blue-600"
+                  ></ion-icon>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ file.name }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    {{ formatFileSize(file.size) }} • {{ selectedDocType }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="removeFile(i)"
+                class="text-red-600 hover:text-red-800 p-1"
+              >
+                <ion-icon name="close-circle-outline"></ion-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Information Notice -->
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div class="flex items-start">
@@ -168,15 +277,15 @@
           ></ion-icon>
           <div>
             <h3 class="text-sm font-medium text-blue-900 mb-1">
-              What happens after registration?
+              Document Upload Process
             </h3>
             <ul class="text-sm text-blue-800 space-y-1">
+              <li>• First, the client will be created</li>
+              <li>• Then, all selected documents will be uploaded</li>
               <li>
-                • Client will be created with "Pending" verification status
+                • Documents will be available for verification immediately
               </li>
-              <li>• You can upload required documents for verification</li>
-              <li>• Client users can be added after verification approval</li>
-              <li>• Payment processing will be enabled post-verification</li>
+              <li>• You can upload documents later if needed</li>
             </ul>
           </div>
         </div>
@@ -226,13 +335,23 @@
           [disabled]="clientForm.invalid || isLoading"
           class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors font-medium flex items-center"
         >
-          <span *ngIf="!isLoading">Create Client</span>
-          <span *ngIf="isLoading" class="flex items-center">
+          <span *ngIf="!isLoading && !isUploadingDocuments">Create Client</span>
+          <span
+            *ngIf="isLoading && !isUploadingDocuments"
+            class="flex items-center"
+          >
             <ion-icon
               name="refresh-outline"
               class="animate-spin mr-2"
             ></ion-icon>
-            Creating...
+            Creating Client...
+          </span>
+          <span *ngIf="isUploadingDocuments" class="flex items-center">
+            <ion-icon
+              name="cloud-upload-outline"
+              class="animate-pulse mr-2"
+            ></ion-icon>
+            Uploading Documents... ({{ selectedFiles.length }})
           </span>
         </button>
       </div>
