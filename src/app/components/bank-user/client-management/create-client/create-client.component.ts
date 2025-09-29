@@ -72,7 +72,7 @@ export class CreateClientComponent implements OnInit {
     this.successMessage = '';
 
     const formData: ClientCreateRequest = {
-      clientName: this.clientForm.get('name')?.value?.trim(),
+      clientName: this.clientForm.get('clientName')?.value?.trim(),
       registerationNumber: this.clientForm.get('registerationNumber')?.value?.trim(),
       address: this.clientForm.get('address')?.value?.trim(),
       bankId: this.currentUser?.bankId || 0,
@@ -89,7 +89,7 @@ export class CreateClientComponent implements OnInit {
 
           // Redirect after 2 seconds
           setTimeout(() => {
-            this.router.navigate(['/bank-admin/clients']);
+            this.router.navigate(['/bank-user/clients']);
           }, 2000);
         } else {
           this.errorMessage = response.message || 'Failed to create client. Please try again.';

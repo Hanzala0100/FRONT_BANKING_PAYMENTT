@@ -1,1 +1,241 @@
-<p>pending-payments works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Pending Payments</h1>
+      <p class="text-gray-600 mt-1">
+        Review and approve pending payment transactions
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex space-x-3">
+      <button
+        (click)="loadPendingPayments()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+      <a
+        routerLink="/bank-user/payments"
+        class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="list-outline" class="mr-2"></ion-icon>
+        All Payments
+      </a>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-3 rounded-lg">
+          <ion-icon
+            name="hourglass-outline"
+            class="text-orange-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Pending Approval</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ pendingPayments.length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon
+            name="business-outline"
+            class="text-blue-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Clients Waiting</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ getUniqueClientsCount() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon
+            name="cash-outline"
+            class="text-green-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Amount</p>
+          <p class="text-2xl font-bold text-gray-900">
+            ₹{{ getTotalAmount() | number : "1.2-2" }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Payments List -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900">
+        Payments Awaiting Approval ({{ pendingPayments.length }})
+      </h2>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <table
+        class="min-w-full divide-y divide-gray-200"
+        *ngIf="pendingPayments.length > 0; else noPendingTemplate"
+      >
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Payment Details
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Client & Beneficiary
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Amount & Date
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            *ngFor="let payment of pendingPayments"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <!-- Payment Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="bg-orange-100 p-2 rounded-lg mr-3">
+                  <ion-icon
+                    name="hourglass-outline"
+                    class="text-orange-600"
+                  ></ion-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    Payment #{{ payment.paymentId }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ payment.paymentDate | date : "medium" }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Client & Beneficiary -->
+            <td class="px-6 py-4">
+              <div class="space-y-1">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ payment.clientName }}
+                  </p>
+                  <p class="text-xs text-gray-500">Client</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-900">
+                    {{ payment.beneficiaryName }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    Account: {{ payment.beneficiaryAccountNumber }}
+                  </p>
+                </div>
+              </div>
+            </td>
+
+            <!-- Amount & Date -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-lg font-semibold text-gray-900">
+                ₹{{ payment.amount | number : "1.2-2" }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ payment.createdAt | date : "shortDate" }}
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex items-center space-x-3">
+                <a
+                  [routerLink]="['/bank-user/payments', payment.paymentId]"
+                  class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
+                >
+                  <ion-icon name="eye-outline" class="mr-1"></ion-icon>
+                  Review
+                </a>
+
+                <button
+                  (click)="quickApprove(payment)"
+                  class="text-green-600 hover:text-green-900 transition-colors flex items-center"
+                >
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="mr-1"
+                  ></ion-icon>
+                  Approve
+                </button>
+
+                <button
+                  (click)="quickReject(payment)"
+                  class="text-red-600 hover:text-red-900 transition-colors flex items-center"
+                >
+                  <ion-icon name="close-circle-outline" class="mr-1"></ion-icon>
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #noPendingTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="checkmark-done-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No pending payments
+          </h3>
+          <p class="text-gray-500 mb-6">All payments have been processed.</p>
+          <a
+            routerLink="/bank-user/payments"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <ion-icon name="list-outline" class="mr-2"></ion-icon>
+            View All Payments
+          </a>
+        </div>
+      </ng-template>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading pending payments...</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

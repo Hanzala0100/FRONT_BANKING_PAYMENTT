@@ -193,7 +193,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
 
             <!-- Action Buttons -->
             <div *ngIf="selectedClientId !== client.clientId" class="flex items-center justify-end space-x-3">
-              <a [routerLink]="['/bank-admin/clients', client.clientId]"
+              <a [routerLink]="['/bank-user/clients', client.clientId]"
                  class="flex items-center px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
                 <ion-icon name="eye-outline" class="mr-2"></ion-icon>
                 View Details
@@ -227,7 +227,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
                 </div>
               </div>
 
-              <a [routerLink]="['/bank-admin/clients', client.clientId]"
+              <a [routerLink]="['/bank-user/clients', client.clientId]"
                  class="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 View Details →
               </a>
@@ -246,7 +246,7 @@ import { ClientVerificationRequest } from '../../../../shared/models/Document.in
           <p class="text-gray-500 mb-6">
             {{ activeFilter === 'pending' ? 'All clients have been verified.' : 'No clients match the selected filter.' }}
           </p>
-          <a routerLink="/bank-admin/clients/create"
+          <a routerLink="/bank-user/clients/create"
              *ngIf="activeFilter === 'pending'"
              class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <ion-icon name="add" class="mr-2"></ion-icon>

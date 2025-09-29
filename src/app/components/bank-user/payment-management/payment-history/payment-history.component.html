@@ -1,1 +1,310 @@
-<p>payment-history works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Payment History</h1>
+      <p class="text-gray-600 mt-1">View and manage all payment transactions</p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex space-x-3">
+      <button
+        (click)="loadPayments()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+      <a
+        routerLink="/bank-user/payments/pending"
+        class="flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="hourglass-outline" class="mr-2"></ion-icon>
+        Pending Payments
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Status</label
+        >
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+
+      <!-- Date Range -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >From Date</label
+        >
+        <input
+          type="date"
+          [(ngModel)]="startDate"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >To Date</label
+        >
+        <input
+          type="date"
+          [(ngModel)]="endDate"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+
+      <!-- Client Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Client</label
+        >
+        <select
+          [(ngModel)]="selectedClientId"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="">All Clients</option>
+          <option *ngFor="let client of clients" [value]="client.clientId">
+            {{ client.clientName }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-2 rounded-lg">
+          <ion-icon
+            name="card-outline"
+            class="text-blue-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Total Payments</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ allPayments.length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-2 rounded-lg">
+          <ion-icon
+            name="checkmark-circle-outline"
+            class="text-green-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Approved</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ getApprovedCount() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-2 rounded-lg">
+          <ion-icon
+            name="time-outline"
+            class="text-orange-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Pending</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ getPendingCount() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-red-100 p-2 rounded-lg">
+          <ion-icon
+            name="close-circle-outline"
+            class="text-red-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Rejected</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ getRejectedCount() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payments Table -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900">
+        Payment Transactions ({{ filteredPayments.length }})
+      </h2>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <table
+        class="min-w-full divide-y divide-gray-200"
+        *ngIf="filteredPayments.length > 0; else noPaymentsTemplate"
+      >
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Payment Details
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Client & Beneficiary
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Amount & Date
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status & Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            *ngFor="let payment of filteredPayments"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <!-- Payment Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                  <ion-icon
+                    name="card-outline"
+                    class="text-blue-600"
+                  ></ion-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    Payment #{{ payment.paymentId }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ payment.paymentDate | date : "medium" }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Client & Beneficiary -->
+            <td class="px-6 py-4">
+              <div class="space-y-1">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ payment.clientName }}
+                  </p>
+                  <p class="text-xs text-gray-500">Client</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-900">
+                    {{ payment.beneficiaryName }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    Account: {{ payment.beneficiaryAccountNumber }}
+                  </p>
+                </div>
+              </div>
+            </td>
+
+            <!-- Amount & Date -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-lg font-semibold text-gray-900">
+                ₹{{ payment.amount | number : "1.2-2" }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ payment.createdAt | date : "shortDate" }}
+              </div>
+            </td>
+
+            <!-- Status & Actions -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="space-y-2">
+                <span
+                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                  [ngClass]="getStatusBadgeClass(payment.status)"
+                >
+                  {{ payment.status }}
+                </span>
+                <div class="flex items-center space-x-2">
+                  <a
+                    [routerLink]="['/bank-user/payments', payment.paymentId]"
+                    class="text-blue-600 hover:text-blue-900 text-sm font-medium"
+                  >
+                    View Details
+                  </a>
+                  <span
+                    *ngIf="payment.approvedByName"
+                    class="text-xs text-gray-500"
+                  >
+                    By: {{ payment.approvedByName }}
+                  </span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #noPaymentsTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="card-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No payments found
+          </h3>
+          <p class="text-gray-500">
+            No payment transactions match your current filters.
+          </p>
+        </div>
+      </ng-template>
+    </div>
+
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading payments...</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

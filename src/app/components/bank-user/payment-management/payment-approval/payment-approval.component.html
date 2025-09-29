@@ -1,1 +1,362 @@
-<p>payment-approval works!</p>
+<div class="p-6 max-w-4xl mx-auto" *ngIf="!isLoading; else loadingTemplate">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center space-x-4">
+      <a
+        routerLink="/bank-user/payments/pending"
+        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          class="text-lg text-gray-600"
+        ></ion-icon>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Payment Approval</h1>
+        <p class="text-gray-600">Review and process payment transaction</p>
+      </div>
+    </div>
+
+    <span
+      class="inline-flex px-3 py-1 text-sm font-semibold rounded-full"
+      [ngClass]="getStatusBadgeClass(payment?.status)"
+    >
+      {{ payment?.status }}
+    </span>
+  </div>
+
+  <!-- Payment Details Card -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <ion-icon
+        name="information-circle-outline"
+        class="mr-2 text-blue-600"
+      ></ion-icon>
+      Payment Details
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Payment Information -->
+      <div class="space-y-4">
+        <h3 class="text-md font-medium text-gray-900">
+          Transaction Information
+        </h3>
+
+        <div class="space-y-3">
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Payment ID:</span>
+            <span class="font-medium text-gray-900">#{{ payment?.id }}</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Amount:</span>
+            <span class="font-medium text-gray-900 text-lg"
+              >₹{{ payment?.amount | number : "1.2-2" }}</span
+            >
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Payment Date:</span>
+            <span class="font-medium text-gray-900">{{
+              payment?.paymentDate | date : "medium"
+            }}</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-600">Created:</span>
+            <span class="font-medium text-gray-900">{{
+              payment?.createdAt | date : "medium"
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Information -->
+      <div class="space-y-4">
+        <h3 class="text-md font-medium text-gray-900">Client Information</h3>
+
+        <div class="space-y-3">
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Client:</span>
+            <span class="font-medium text-gray-900">{{
+              payment?.clientName
+            }}</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Beneficiary:</span>
+            <span class="font-medium text-gray-900">{{
+              payment?.beneficiaryName
+            }}</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Account Number:</span>
+            <span class="font-medium text-gray-900">{{
+              payment?.beneficiaryAccountNumber
+            }}</span>
+          </div>
+          <div
+            *ngIf="payment?.approvedByName"
+            class="flex justify-between py-2"
+          >
+            <span class="text-gray-600">Processed By:</span>
+            <span class="font-medium text-gray-900">{{
+              payment?.approvedByName
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approval Form (Only for pending payments) -->
+  <div
+    *ngIf="payment?.status === 'Pending'"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+  >
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+      <ion-icon
+        name="checkmark-done-outline"
+        class="mr-2 text-green-600"
+      ></ion-icon>
+      Payment Decision
+    </h2>
+
+    <form [formGroup]="approvalForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Decision Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-3">
+          Decision <span class="text-red-500">*</span>
+        </label>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label
+            class="relative flex cursor-pointer rounded-lg border border-gray-200 p-4 focus:outline-none"
+            [class.border-green-500]="
+              approvalForm.get('decision')?.value === 'approve'
+            "
+            [class.bg-green-50]="
+              approvalForm.get('decision')?.value === 'approve'
+            "
+          >
+            <input
+              type="radio"
+              formControlName="decision"
+              value="approve"
+              class="sr-only"
+            />
+            <div class="flex items-center">
+              <div class="flex items-center h-5">
+                <ion-icon
+                  name="checkmark-circle-outline"
+                  [class.text-green-600]="
+                    approvalForm.get('decision')?.value === 'approve'
+                  "
+                  [class.text-gray-400]="
+                    approvalForm.get('decision')?.value !== 'approve'
+                  "
+                  class="text-xl mr-3"
+                ></ion-icon>
+              </div>
+              <div class="ml-3 flex flex-col">
+                <span class="block text-sm font-medium text-gray-900"
+                  >Approve Payment</span
+                >
+                <span class="block text-sm text-gray-500"
+                  >Process this payment transaction</span
+                >
+              </div>
+            </div>
+          </label>
+
+          <label
+            class="relative flex cursor-pointer rounded-lg border border-gray-200 p-4 focus:outline-none"
+            [class.border-red-500]="
+              approvalForm.get('decision')?.value === 'reject'
+            "
+            [class.bg-red-50]="approvalForm.get('decision')?.value === 'reject'"
+          >
+            <input
+              type="radio"
+              formControlName="decision"
+              value="reject"
+              class="sr-only"
+            />
+            <div class="flex items-center">
+              <div class="flex items-center h-5">
+                <ion-icon
+                  name="close-circle-outline"
+                  [class.text-red-600]="
+                    approvalForm.get('decision')?.value === 'reject'
+                  "
+                  [class.text-gray-400]="
+                    approvalForm.get('decision')?.value !== 'reject'
+                  "
+                  class="text-xl mr-3"
+                ></ion-icon>
+              </div>
+              <div class="ml-3 flex flex-col">
+                <span class="block text-sm font-medium text-gray-900"
+                  >Reject Payment</span
+                >
+                <span class="block text-sm text-gray-500"
+                  >Decline this payment transaction</span
+                >
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
+          Notes <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          id="notes"
+          formControlName="notes"
+          rows="4"
+          placeholder="Enter approval notes or reason for rejection..."
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          [class.border-red-300]="
+            approvalForm.get('notes')?.invalid &&
+            approvalForm.get('notes')?.touched
+          "
+        ></textarea>
+        <div
+          *ngIf="
+            approvalForm.get('notes')?.invalid &&
+            approvalForm.get('notes')?.touched
+          "
+          class="text-red-600 text-sm mt-1 flex items-center"
+        >
+          <ion-icon name="alert-circle-outline" class="mr-1 text-sm"></ion-icon>
+          Notes are required
+        </div>
+      </div>
+
+      <!-- Error/Success Messages -->
+      <div
+        *ngIf="errorMessage"
+        class="bg-red-50 border border-red-200 rounded-lg p-4"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="alert-circle-outline"
+            class="text-red-600 mr-2"
+          ></ion-icon>
+          <p class="text-red-700 text-sm">{{ errorMessage }}</p>
+        </div>
+      </div>
+
+      <div
+        *ngIf="successMessage"
+        class="bg-green-50 border border-green-200 rounded-lg p-4"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="checkmark-circle-outline"
+            class="text-green-600 mr-2"
+          ></ion-icon>
+          <p class="text-green-700 text-sm">{{ successMessage }}</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div
+        class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200"
+      >
+        <button
+          type="button"
+          routerLink="/bank-user/payments/pending"
+          class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="approvalForm.invalid || isSubmitting"
+          class="px-6 py-3 font-medium rounded-lg transition-colors flex items-center"
+          [class.bg-green-600]="
+            approvalForm.get('decision')?.value === 'approve'
+          "
+          [class.hover:bg-green-700]="
+            approvalForm.get('decision')?.value === 'approve'
+          "
+          [class.bg-red-600]="approvalForm.get('decision')?.value === 'reject'"
+          [class.hover:bg-red-700]="
+            approvalForm.get('decision')?.value === 'reject'
+          "
+          [class.bg-gray-300]="!approvalForm.get('decision')?.value"
+          class="text-white disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          <div
+            *ngIf="isSubmitting"
+            class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
+          ></div>
+          <ion-icon
+            *ngIf="
+              !isSubmitting && approvalForm.get('decision')?.value === 'approve'
+            "
+            name="checkmark-outline"
+            class="mr-2"
+          ></ion-icon>
+          <ion-icon
+            *ngIf="
+              !isSubmitting && approvalForm.get('decision')?.value === 'reject'
+            "
+            name="close-outline"
+            class="mr-2"
+          ></ion-icon>
+          {{
+            isSubmitting
+              ? "Processing..."
+              : approvalForm.get("decision")?.value === "approve"
+              ? "Approve Payment"
+              : "Reject Payment"
+          }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Already Processed Message -->
+  <div
+    *ngIf="payment?.status !== 'Pending'"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+  >
+    <div class="text-center py-8">
+      <ion-icon
+        [name]="
+          payment?.status === 'Approved'
+            ? 'checkmark-done-circle-outline'
+            : 'close-circle-outline'
+        "
+        [class.text-green-500]="payment?.status === 'Approved'"
+        [class.text-red-500]="payment?.status === 'Rejected'"
+        class="text-6xl mb-4"
+      >
+      </ion-icon>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        Payment Already {{ payment?.status }}
+      </h3>
+      <p class="text-gray-500 mb-6">
+        This payment has already been processed and cannot be modified.
+      </p>
+      <a
+        routerLink="/bank-user/payments/pending"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon>
+        Back to Pending Payments
+      </a>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="p-6">
+    <div class="text-center py-12">
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+      ></div>
+      <p class="text-gray-500 mt-2">Loading payment details...</p>
+    </div>
+  </div>
+</ng-template>

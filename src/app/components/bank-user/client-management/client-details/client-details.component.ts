@@ -119,7 +119,7 @@ export class ClientDetailsComponent implements OnInit {
 
   verifyClient() {
     if (this.client) {
-      this.router.navigate(['/bank-admin/verification'], {
+      this.router.navigate(['/bank-user/verification'], {
         queryParams: { clientId: this.client.clientId }
       });
     }
@@ -131,7 +131,7 @@ export class ClientDetailsComponent implements OnInit {
       this.bankUserService.deleteClient(this.client.clientId).subscribe({
         next: (response) => {
           if (response.success) {
-            this.router.navigate(['/bank-admin/clients']);
+            this.router.navigate(['/bank-user/clients']);
           }
         },
         error: (error) => console.error('Error deleting client:', error)

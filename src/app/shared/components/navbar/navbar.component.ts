@@ -168,7 +168,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.hasRole('SuperAdmin')) {
       this.router.navigate(['/super-admin/profile']);
     } else if (this.hasRole('BankAdmin')) {
-      this.router.navigate(['/bank-admin/profile']);
+      this.router.navigate(['/bank-user/profile']);
     } else {
       this.router.navigate(['/client/profile']);
     }
@@ -180,7 +180,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.hasRole('SuperAdmin')) {
       this.router.navigate(['/super-admin/settings']);
     } else if (this.hasRole('BankAdmin')) {
-      this.router.navigate(['/bank-admin/settings']);
+      this.router.navigate(['/bank-user/settings']);
     } else {
       this.router.navigate(['/client/settings']);
     }
