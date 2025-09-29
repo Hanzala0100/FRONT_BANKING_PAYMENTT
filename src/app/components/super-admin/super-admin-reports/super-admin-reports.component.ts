@@ -89,6 +89,7 @@ export class SuperAdminReportsComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.reports = response.data;
+
         }
         this.isLoading = false;
       },
@@ -98,6 +99,18 @@ export class SuperAdminReportsComponent implements OnInit {
       }
     });
   }
+
+  converToLocalTime(utcDateString: string): Date {
+    // Parse as UTC
+    const utcDate = new Date(utcDateString);
+
+    // Convert to IST (UTC + 5:30)
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const localDate = new Date(utcDate.getTime() + istOffset);
+
+    return localDate;
+  }
+
 
   loadStatistics(): void {
     this.reportService.getReportStatistics().subscribe({
@@ -186,32 +199,32 @@ export class SuperAdminReportsComponent implements OnInit {
   }
 
   getRelativeTime(timestamp: string): string {
-  const now = new Date();
+    const now = new Date();
 
-  // Parse UTC timestamp
-  const utcDate = new Date(timestamp);
+    // Parse UTC timestamp
+    const utcDate = new Date(timestamp);
 
-  // Convert UTC → IST (+5:30 hours = 330 minutes)
-  const istDate = new Date(utcDate.getTime() + (330 * 60 * 1000));
+    // Convert UTC → IST (+5:30 hours = 330 minutes)
+    const istDate = new Date(utcDate.getTime() + (330 * 60 * 1000));
 
-  const diffInMinutes = Math.floor((now.getTime() - istDate.getTime()) / (1000 * 60));
+    const diffInMinutes = Math.floor((now.getTime() - istDate.getTime()) / (1000 * 60));
 
-  if (diffInMinutes < 0) {
-    return "in the future";
+    if (diffInMinutes < 0) {
+      return "in the future";
+    }
+
+    if (diffInMinutes < 1) {
+      return "just now";
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
+    } else if (diffInMinutes < 1440) {
+      const hours = Math.floor(diffInMinutes / 60);
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else {
+      const days = Math.floor(diffInMinutes / 1440);
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    }
   }
-
-  if (diffInMinutes < 1) {
-    return "just now";
-  } else if (diffInMinutes < 60) {
-    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
-  } else if (diffInMinutes < 1440) {
-    const hours = Math.floor(diffInMinutes / 60);
-    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  } else {
-    const days = Math.floor(diffInMinutes / 1440);
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  }
-}
 
   // Helper to get report count by type from statistics
   getReportCountByType(type: string): number {
