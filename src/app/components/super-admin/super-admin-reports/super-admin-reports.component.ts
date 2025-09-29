@@ -186,22 +186,32 @@ export class SuperAdminReportsComponent implements OnInit {
   }
 
   getRelativeTime(timestamp: string): string {
+  const now = new Date();
 
-    
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60));
+  // Parse UTC timestamp
+  const utcDate = new Date(timestamp);
 
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} minutes ago`;
-    } else if (diffInMinutes < 1440) {
-      const hours = Math.floor(diffInMinutes / 60);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else {
-      const days = Math.floor(diffInMinutes / 1440);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    }
+  // Convert UTC → IST (+5:30 hours = 330 minutes)
+  const istDate = new Date(utcDate.getTime() + (330 * 60 * 1000));
+
+  const diffInMinutes = Math.floor((now.getTime() - istDate.getTime()) / (1000 * 60));
+
+  if (diffInMinutes < 0) {
+    return "in the future";
   }
+
+  if (diffInMinutes < 1) {
+    return "just now";
+  } else if (diffInMinutes < 60) {
+    return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
+  } else if (diffInMinutes < 1440) {
+    const hours = Math.floor(diffInMinutes / 60);
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else {
+    const days = Math.floor(diffInMinutes / 1440);
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  }
+}
 
   // Helper to get report count by type from statistics
   getReportCountByType(type: string): number {
