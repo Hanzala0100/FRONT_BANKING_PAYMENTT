@@ -117,12 +117,12 @@
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
                 <div
-  class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mr-3"
->
-  <span class="text-sm font-medium text-white">
-    {{ getEmployeeInitials(employee.fullName) }}
-  </span>
-</div>
+                  class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mr-3"
+                >
+                  <span class="text-sm font-medium text-white">
+                    {{ getEmployeeInitials(employee.fullName) }}
+                  </span>
+                </div>
                 <div>
                   <div class="text-sm font-medium text-gray-900">
                     {{ employee.fullName }}
@@ -137,7 +137,9 @@
             <!-- Contact -->
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ employee.email }}</div>
-              <div class="text-sm text-gray-500">{{ employee.phoneNumber }}</div>
+              <div class="text-sm text-gray-500">
+                {{ employee.phoneNumber }}
+              </div>
             </td>
 
             <!-- Bank Details -->
@@ -161,7 +163,7 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <div class="flex items-center space-x-3">
                 <a
-                  [routerLink]="['/client-user/employees', employee.clientId]"
+                  [routerLink]="['/client-user/employees', employee.employeeId]"
                   class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
                 >
                   <ion-icon name="eye-outline" class="mr-1"></ion-icon>

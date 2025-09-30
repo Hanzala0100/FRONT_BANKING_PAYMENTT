@@ -7,7 +7,7 @@ export interface Employee {
   email: string;
   accountNumber: number;
   bankName: string;
-  ifscCode: string;
+  ifsccode: string;
   salaryAmount: number;
 }
 
@@ -20,7 +20,7 @@ export interface EmployeeCreateRequest {
   email: string;
   accountNumber: number;
   bankName: string;
-  ifscCode: string;
+  ifsccode: string;
   salaryAmount: number;
 }
 

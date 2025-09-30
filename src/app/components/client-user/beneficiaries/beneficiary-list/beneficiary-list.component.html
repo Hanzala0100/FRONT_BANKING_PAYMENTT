@@ -1,1 +1,363 @@
-<p>beneficiary-list works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Beneficiary Management</h1>
+      <p class="text-gray-600 mt-1">Manage and monitor payment beneficiaries</p>
+    </div>
+    <div class="mt-4 sm:mt-0">
+      <a
+        routerLink="/client-user/beneficiaries/create"
+        class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="person-add-outline" class="mr-2"></ion-icon>
+        Add Beneficiary
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Search -->
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Search Beneficiaries</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Search by name, account number, bank, IFSC..."
+            class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <!-- Sort -->
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Sort By</label
+        >
+        <select
+          [(ngModel)]="sortBy"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        >
+          <option value="name">Name (A-Z)</option>
+          <option value="bank">Bank Name</option>
+          <option value="payments">Payment Count</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-2 rounded-lg">
+          <ion-icon
+            name="person-outline"
+            class="text-green-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Total Beneficiaries</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ beneficiaries.length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-2 rounded-lg">
+          <ion-icon
+            name="card-outline"
+            class="text-blue-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Active Payments</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ getTotalPayments() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-2 rounded-lg">
+          <ion-icon
+            name="business-outline"
+            class="text-purple-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Unique Banks</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ getUniqueBanksCount() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-2 rounded-lg">
+          <ion-icon
+            name="trending-up-outline"
+            class="text-orange-600 text-lg"
+          ></ion-icon>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-gray-600">Most Active</p>
+          <p class="text-xl font-semibold text-gray-900">
+            {{ getMostActivePayments() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Beneficiaries Table -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900">
+        Beneficiaries ({{ filteredBeneficiaries.length }})
+      </h2>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <table
+        class="min-w-full divide-y divide-gray-200"
+        *ngIf="filteredBeneficiaries.length > 0; else noBeneficiariesTemplate"
+      >
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Beneficiary
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Bank Details
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Account Information
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Payment History
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            *ngFor="let beneficiary of filteredBeneficiaries"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <!-- Beneficiary Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div
+                  class="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center mr-3"
+                >
+                  <span class="text-sm font-medium text-white">{{
+                    getBeneficiaryInitials(beneficiary.fullName)
+                  }}</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ beneficiary.fullName }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    ID: #{{ beneficiary.beneficiaryId }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Bank Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">
+                {{ beneficiary.bankName }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ beneficiary.ifscCode }}
+              </div>
+            </td>
+
+            <!-- Account Information -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ formatAccountNumber(beneficiary.accountNumber) }}
+              </div>
+              <div class="text-sm text-gray-500">
+                Account ends with
+                {{ beneficiary.accountNumber.toString().slice(-4) }}
+              </div>
+            </td>
+
+            <!-- Payment History -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                  <ion-icon
+                    name="card-outline"
+                    class="text-blue-600"
+                  ></ion-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ getPaymentCountText(beneficiary.totalPayments) }}
+                  </div>
+                  <div class="text-xs text-gray-500">Total transactions</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex items-center space-x-3">
+                <a
+                  [routerLink]="[
+                    '/client-user/beneficiaries',
+                    beneficiary.beneficiaryId
+                  ]"
+                  class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
+                  title="View Details"
+                >
+                  <ion-icon name="eye-outline" class="mr-1"></ion-icon>
+                  View
+                </a>
+
+                <a
+                  routerLink="/client-user/payments/create"
+                  [queryParams]="{ beneficiaryId: beneficiary.beneficiaryId }"
+                  class="text-green-600 hover:text-green-900 transition-colors flex items-center"
+                  title="Make Payment"
+                >
+                  <ion-icon name="card-outline" class="mr-1"></ion-icon>
+                  Pay
+                </a>
+
+                <button
+                  (click)="deleteBeneficiary(beneficiary)"
+                  class="text-red-600 hover:text-red-900 transition-colors flex items-center"
+                  title="Delete Beneficiary"
+                >
+                  <ion-icon name="trash-outline" class="mr-1"></ion-icon>
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Beneficiaries Template -->
+      <ng-template #noBeneficiariesTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="person-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No beneficiaries found
+          </h3>
+          <p class="text-gray-500 mb-6">
+            Get started by adding your first payment beneficiary.
+          </p>
+          <a
+            routerLink="/client-user/beneficiaries/create"
+            class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <ion-icon name="person-add-outline" class="mr-2"></ion-icon>
+            Add First Beneficiary
+          </a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading beneficiaries...</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Quick Stats -->
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 gap-6"
+    *ngIf="beneficiaries.length > 0"
+  >
+    <!-- Most Used Banks -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Most Used Banks</h3>
+      <div class="space-y-3">
+        <div
+          *ngFor="let bank of getTopBanks()"
+          class="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0"
+        >
+          <span class="text-sm text-gray-600">{{ bank.name }}</span>
+          <span class="text-sm font-medium text-gray-900"
+            >{{ bank.count }} beneficiaries</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Activity -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Activity</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Total Payments Processed</span>
+          <span class="text-sm font-medium text-gray-900">{{
+            getTotalPayments()
+          }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600"
+            >Average Payments per Beneficiary</span
+          >
+          <span class="text-sm font-medium text-gray-900">{{
+            getAveragePayments()
+          }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Most Active Beneficiary</span>
+          <span class="text-sm font-medium text-gray-900"
+            >{{ getMostActivePayments() }} payments</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

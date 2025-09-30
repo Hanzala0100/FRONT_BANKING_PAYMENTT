@@ -60,7 +60,7 @@ export class CreateEmployeeComponent implements OnInit {
       email: this.employeeForm.value.email.trim(),
       accountNumber: parseInt(this.employeeForm.value.accountNumber),
       bankName: this.employeeForm.value.bankName.trim(),
-      ifscCode: this.employeeForm.value.ifscCode.trim().toUpperCase(),
+      ifsccode: this.employeeForm.value.ifscCode.trim().toUpperCase(),
       salaryAmount: parseFloat(this.employeeForm.value.salaryAmount)
     };
 
