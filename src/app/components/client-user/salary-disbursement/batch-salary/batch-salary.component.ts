@@ -52,7 +52,7 @@ export class BatchSalaryComponent implements OnInit {
           this.employees = response.data;
           // Initialize selected employees with their current salary
           this.selectedEmployees = this.employees.map(emp => ({
-            employeeId: emp.clientId,
+            employeeId: emp.employeeId,
             amount: emp.salaryAmount
           }));
         }

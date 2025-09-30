@@ -65,10 +65,10 @@ export class DisburseSalaryComponent implements OnInit {
 
           // Pre-select employee if provided in query params
           if (this.selectedEmployeeId) {
-            const employee = this.employees.find(emp => emp.clientId === this.selectedEmployeeId);
+            const employee = this.employees.find(emp => emp.employeeId === this.selectedEmployeeId);
             if (employee) {
               this.salaryForm.patchValue({
-                employeeId: employee.clientId,
+                employeeId: employee.employeeId,
                 amount: employee.salaryAmount
               });
               this.onEmployeeChange();
@@ -87,7 +87,7 @@ export class DisburseSalaryComponent implements OnInit {
 
   onEmployeeChange(): void {
     const employeeId = this.salaryForm.get('employeeId')?.value;
-    const employee = this.employees.find(emp => emp.clientId === parseInt(employeeId));
+    const employee = this.employees.find(emp => emp.employeeId === parseInt(employeeId));
 
     if (employee) {
       // Auto-fill amount with employee's salary if not already set
@@ -142,7 +142,7 @@ export class DisburseSalaryComponent implements OnInit {
 
   getSelectedEmployee() {
     const employeeId = this.salaryForm.get('employeeId')?.value;
-    return this.employees.find(emp => emp.clientId === parseInt(employeeId));
+    return this.employees.find(emp => emp.employeeId === parseInt(employeeId));
   }
 
   private markFormGroupTouched(): void {
