@@ -1,1 +1,420 @@
-<p>salary-list works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">
+        Salary Disbursement History
+      </h1>
+      <p class="text-gray-600 mt-1">View and manage all salary transactions</p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex space-x-3">
+      <button
+        (click)="loadSalaries()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+      <a
+        routerLink="/client-user/salary/disburse"
+        class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="cash-outline" class="mr-2"></ion-icon>
+        Disburse Salary
+      </a>
+      <a
+        routerLink="/client-user/salary/batch"
+        class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="document-text-outline" class="mr-2"></ion-icon>
+        Batch Salary
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Search -->
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Search Salaries</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Search by employee name, account number..."
+            class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Status</label
+        >
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        >
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Date Range -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Date Range</label
+        >
+        <select
+          [(ngModel)]="selectedDateRange"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        >
+          <option
+            *ngFor="let option of dateRangeOptions"
+            [value]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Custom Date Range -->
+    <div
+      *ngIf="selectedDateRange === 'custom'"
+      class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
+    >
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >From Date</label
+        >
+        <input
+          type="date"
+          [(ngModel)]="startDate"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >To Date</label
+        >
+        <input
+          type="date"
+          [(ngModel)]="endDate"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-3 rounded-lg">
+          <ion-icon
+            name="cash-outline"
+            class="text-orange-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Salaries</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ filteredSalaries.length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon
+            name="checkmark-circle-outline"
+            class="text-green-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Completed</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ getStatusCount("Completed") }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon
+            name="sync-outline"
+            class="text-blue-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Processing</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ getStatusCount("Processing") }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <ion-icon
+            name="trending-up-outline"
+            class="text-purple-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Amount</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ formatSalary(getTotalAmount()) }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salaries Table -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">
+          Salary Transactions ({{ filteredSalaries.length }})
+        </h2>
+        <div class="text-sm text-gray-500">
+          Showing {{ filteredSalaries.length }} of
+          {{ salaries.length }} salaries
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <table
+        class="min-w-full divide-y divide-gray-200"
+        *ngIf="filteredSalaries.length > 0; else noSalariesTemplate"
+      >
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Salary Details
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Employee
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Amount & Date
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Status
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr
+            *ngFor="let salary of filteredSalaries"
+            class="hover:bg-gray-50 transition-colors"
+          >
+            <!-- Salary Details -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="bg-orange-100 p-2 rounded-lg mr-3">
+                  <ion-icon
+                    [name]="getStatusIcon(salary.status)"
+                    class="text-orange-600"
+                  ></ion-icon>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    Salary #{{ salary.salaryId }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ salary.disbursementDate | date : "medium" }}
+                  </div>
+                  <div class="text-xs text-gray-400">
+                    Created: {{ salary.createdAt | date : "short" }}
+                  </div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Employee -->
+            <td class="px-6 py-4">
+              <div class="space-y-1">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ salary.employeeName }}
+                  </p>
+                  <p class="text-xs text-gray-500">Employee</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-900">
+                    A/C: {{ salary.employeeAccountNumber }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    {{ salary.clientName }}
+                  </p>
+                </div>
+              </div>
+            </td>
+
+            <!-- Amount & Date -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-lg font-semibold text-gray-900">
+                {{ formatSalary(salary.amount) }}
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ salary.disbursementDate | date : "mediumDate" }}
+              </div>
+            </td>
+
+            <!-- Status -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full"
+                [ngClass]="getStatusBadgeClass(salary.status)"
+              >
+                <ion-icon
+                  [name]="getStatusIcon(salary.status)"
+                  class="mr-1 text-xs"
+                ></ion-icon>
+                {{ salary.status }}
+              </span>
+              <div
+                *ngIf="salary.status === 'Pending'"
+                class="text-xs text-gray-500 mt-1"
+              >
+                Ready for processing
+              </div>
+              <div
+                *ngIf="salary.status === 'Processing'"
+                class="text-xs text-gray-500 mt-1"
+              >
+                Being processed
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <div class="flex items-center space-x-3">
+                <button
+                  *ngIf="salary.status === 'Pending'"
+                  (click)="processSalary(salary.salaryId)"
+                  class="text-green-600 hover:text-green-900 transition-colors flex items-center"
+                  title="Process Salary"
+                >
+                  <ion-icon name="play-outline" class="mr-1"></ion-icon>
+                  Process
+                </button>
+
+                <a
+                  routerLink="/client-user/salary/disburse"
+                  [queryParams]="{ employeeId: salary.employeeId }"
+                  class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
+                  title="Create Similar Salary"
+                >
+                  <ion-icon name="copy-outline" class="mr-1"></ion-icon>
+                  Repeat
+                </a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- No Salaries Template -->
+      <ng-template #noSalariesTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="cash-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No salary records found
+          </h3>
+          <p class="text-gray-500 mb-6">
+            No salary transactions match your current filters.
+          </p>
+          <a
+            routerLink="/client-user/salary/disburse"
+            class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <ion-icon name="cash-outline" class="mr-2"></ion-icon>
+            Disburse First Salary
+          </a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading salary records...</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Summary Section -->
+  <div
+    *ngIf="filteredSalaries.length > 0"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+  >
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Salary Summary</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-gray-900">
+          {{ formatSalary(getTotalAmount()) }}
+        </div>
+        <p class="text-sm text-gray-600">Total Filtered Amount</p>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-gray-900">
+          {{ getRecentSalariesCount() }}
+        </div>
+        <p class="text-sm text-gray-600">Salaries This Week</p>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-gray-900">
+          {{ formatSalary(getTotalAmount() / filteredSalaries.length) }}
+        </div>
+        <p class="text-sm text-gray-600">Average Salary</p>
+      </div>
+    </div>
+  </div>
+</div>
