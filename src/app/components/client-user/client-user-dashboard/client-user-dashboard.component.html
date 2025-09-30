@@ -1,1 +1,232 @@
-<p>client-user-dashboard works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">
+        Client Dashboard
+      </h1>
+      <p class="text-gray-600 mt-1">
+        Welcome back! Here's your corporate banking overview
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex space-x-3">
+      <button
+        (click)="loadDashboardData()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Employees Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon
+            name="people-outline"
+            class="text-blue-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Employees</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ dashboardStats.totalEmployees }}
+          </p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a
+          routerLink="/client-user/employees"
+          class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
+        >
+          Manage employees
+          <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+        </a>
+      </div>
+    </div>
+
+    <!-- Total Beneficiaries Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon
+            name="person-outline"
+            class="text-green-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Beneficiaries</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ dashboardStats.totalBeneficiaries }}
+          </p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a
+          routerLink="/client-user/beneficiaries"
+          class="text-green-600 hover:text-green-700 text-sm font-medium flex items-center"
+        >
+          View beneficiaries
+          <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+        </a>
+      </div>
+    </div>
+
+    <!-- Total Payments Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <ion-icon
+            name="card-outline"
+            class="text-purple-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Payments</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ dashboardStats.totalPayments }}
+          </p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a
+          routerLink="/client-user/payments"
+          class="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center"
+        >
+          View payments
+          <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+        </a>
+      </div>
+    </div>
+
+    <!-- Salary Disbursements Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-orange-100 p-3 rounded-lg">
+          <ion-icon
+            name="cash-outline"
+            class="text-orange-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Salary Disbursements</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ dashboardStats.totalSalaryDisbursements }}
+          </p>
+        </div>
+      </div>
+      <div class="mt-4">
+        <a
+          routerLink="/client-user/salary"
+          class="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
+        >
+          Manage salary
+          <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a
+        routerLink="/client-user/employees/create"
+        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors group"
+      >
+        <div
+          class="bg-blue-100 p-2 rounded-lg mr-4 group-hover:bg-blue-200 transition-colors"
+        >
+          <ion-icon
+            name="person-add-outline"
+            class="text-blue-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900">Add Employee</h3>
+          <p class="text-sm text-gray-600">Create new employee record</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/client-user/beneficiaries/create"
+        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 transition-colors group"
+      >
+        <div
+          class="bg-green-100 p-2 rounded-lg mr-4 group-hover:bg-green-200 transition-colors"
+        >
+          <ion-icon
+            name="person-add-outline"
+            class="text-green-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900">Add Beneficiary</h3>
+          <p class="text-sm text-gray-600">Create payment beneficiary</p>
+        </div>
+      </a>
+
+      <a
+        routerLink="/client-user/payments/create"
+        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-200 transition-colors group"
+      >
+        <div
+          class="bg-purple-100 p-2 rounded-lg mr-4 group-hover:bg-purple-200 transition-colors"
+        >
+          <ion-icon
+            name="add-circle-outline"
+            class="text-purple-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900">Initiate Payment</h3>
+          <p class="text-sm text-gray-600">Create new payment transaction</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Pending Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Pending Payments -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">Pending Payments</h2>
+        <span class="bg-orange-100 text-orange-800 text-sm font-medium px-2 py-1 rounded-full">
+          {{ dashboardStats.pendingPayments }}
+        </span>
+      </div>
+      <p class="text-gray-600 mb-4">Payments awaiting bank approval</p>
+      <a
+        routerLink="/client-user/payments"
+        class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
+      >
+        Review payments
+        <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+      </a>
+    </div>
+
+    <!-- Pending Salary -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">Pending Salary</h2>
+        <span class="bg-orange-100 text-orange-800 text-sm font-medium px-2 py-1 rounded-full">
+          {{ dashboardStats.pendingSalary }}
+        </span>
+      </div>
+      <p class="text-gray-600 mb-4">Salary disbursements in process</p>
+      <a
+        routerLink="/client-user/salary"
+        class="text-orange-600 hover:text-orange-700 text-sm font-medium flex items-center"
+      >
+        Manage salary
+        <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+      </a>
+    </div>
+  </div>
+</div>
