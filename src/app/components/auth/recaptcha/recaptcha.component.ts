@@ -67,7 +67,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
           }
         );
         this.isLoading = false;
-        console.log('reCAPTCHA v2 widget rendered with ID:', this.widgetId);
+       // console.log('reCAPTCHA v2 widget rendered with ID:', this.widgetId);
       } catch (error) {
         console.error('Error rendering reCAPTCHA widget:', error);
         this.handleError('Failed to initialize security verification');

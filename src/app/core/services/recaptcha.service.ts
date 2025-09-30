@@ -28,8 +28,8 @@ export class RecaptchaService {
   private scriptLoaded = false;
 
   constructor(private http: HttpClient) {
-    console.log('RecaptchaService v2 - SiteKey:', this.siteKey);
-    console.log('RecaptchaService v2 - API URL:', this.apiUrl);
+    //console.log('RecaptchaService v2 - SiteKey:', this.siteKey);
+    //console.log('RecaptchaService v2 - API URL:', this.apiUrl);
   }
 
   loadRecaptchaScript(): Promise<void> {
@@ -47,7 +47,7 @@ export class RecaptchaService {
 
       (window as any).onRecaptchaLoad = () => {
         this.scriptLoaded = true;
-        console.log('reCAPTCHA v2 script loaded successfully');
+        //console.log('reCAPTCHA v2 script loaded successfully');
         resolve();
       };
 
