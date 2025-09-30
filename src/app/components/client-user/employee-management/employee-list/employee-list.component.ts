@@ -71,7 +71,7 @@ export class EmployeeListComponent implements OnInit {
 
   deleteEmployee(employee: Employee) {
     if (confirm(`Are you sure you want to delete ${employee.fullName}?`)) {
-      this.clientUserService.deleteEmployee(employee.clientId).subscribe({
+      this.clientUserService.deleteEmployee(employee.employeeId).subscribe({
         next: (response) => {
           if (response.success) {
             this.loadEmployees();

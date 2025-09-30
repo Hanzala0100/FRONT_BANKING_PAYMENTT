@@ -11,4 +11,17 @@ export interface Employee {
   salaryAmount: number;
 }
 
-export interface EmployeeCreateRequest extends Employee { }
+export interface EmployeeCreateRequest {
+
+  clientId: number;
+  username: string;
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  accountNumber: number;
+  bankName: string;
+  ifscCode: string;
+  salaryAmount: number;
+}
+
+
