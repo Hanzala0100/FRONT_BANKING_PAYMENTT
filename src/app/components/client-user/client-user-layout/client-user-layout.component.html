@@ -1,7 +1,7 @@
 <div class="flex h-screen bg-gray-50">
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
     [class.translate-x-0]="isSidebarOpen"
     [class.-translate-x-full]="!isSidebarOpen"
   >
@@ -65,7 +65,7 @@
               *ngIf="!item.children; else menuWithChildren"
               [routerLink]="item.route"
               routerLinkActive="bg-green-100 text-green-700 border-green-200"
-              class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-transparent"
+              class="flex items-start px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-transparent"
             >
               <ion-icon [name]="item.icon" class="mr-3 text-lg"></ion-icon>
               <span class="font-medium">{{ item.name }}</span>
