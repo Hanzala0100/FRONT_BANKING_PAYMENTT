@@ -70,7 +70,27 @@
           </div>
         </div>
 
-        <!-- Error Message -->
+        <!-- reCAPTCHA Section -->
+<div class="space-y-2">
+  <app-recaptcha
+    [size]="'normal'"
+    [theme]="'light'"
+    [tabindex]="3"
+    (verified)="onRecaptchaVerified($event)"
+    (errored)="onRecaptchaError($event)"
+    (expired)="onRecaptchaExpired()"
+  ></app-recaptcha>
+  
+  <!-- reCAPTCHA Error Message -->
+  <div *ngIf="recaptchaError" class="bg-amber-50 border border-amber-200 rounded-xl p-3">
+    <div class="flex items-center">
+      <ion-icon name="shield-checkmark-outline" class="text-amber-500 text-lg mr-2"></ion-icon>
+      <p class="text-amber-700 text-sm font-medium">{{ recaptchaError }}</p>
+    </div>
+  </div>
+</div>
+
+        <!-- General Error Message -->
         <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-xl p-4">
           <div class="flex items-center">
             <ion-icon name="alert-circle" class="text-red-500 text-lg mr-2"></ion-icon>
@@ -79,15 +99,16 @@
         </div>
 
         <!-- Submit Button -->
-        <button 
-          type="submit" 
-          [disabled]="loginForm.invalid || isLoading"
-          class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-          
-          <div *ngIf="isLoading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-          <ion-icon *ngIf="!isLoading" name="log-in-outline" class="text-lg"></ion-icon>
-          <span>{{ isLoading ? 'Signing In...' : 'Sign In' }}</span>
-        </button>
+        <!-- Submit Button -->
+<button 
+  type="submit" 
+  [disabled]="loginForm.invalid || isLoading || !recaptchaToken"
+  class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+  
+  <div *ngIf="isLoading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+  <ion-icon *ngIf="!isLoading" name="log-in-outline" class="text-lg"></ion-icon>
+  <span>{{ isLoading ? 'Signing In...' : 'Sign In' }}</span>
+</button>
       </form>
 
       <!-- Footer -->
