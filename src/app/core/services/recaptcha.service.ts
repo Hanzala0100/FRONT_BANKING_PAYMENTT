@@ -69,7 +69,7 @@ export class RecaptchaService {
     if (!(window as any).grecaptcha) {
       throw new Error('reCAPTCHA not loaded');
     }
-    
+
     return (window as any).grecaptcha.render(element, {
       sitekey: this.siteKey,
       ...options
@@ -90,17 +90,17 @@ export class RecaptchaService {
   }
 
   verifyToken(token: string): Observable<ApiResponse<boolean>> {
-  const verifyUrl = `${this.apiUrl}/recaptcha/verify`;
-  console.log('Verifying reCAPTCHA token at:', verifyUrl);
-  
-  // If you want to keep it as a mock:
-  return of({
-    success: true,
-    message: 'Mock verification successful',
-    data: true,
-    errors: []
-  } as ApiResponse<boolean>);
-}
+    const verifyUrl = `${this.apiUrl}/recaptcha/verify`;
+    console.log('Verifying reCAPTCHA token at:', verifyUrl);
+
+
+    return of({
+      success: true,
+      message: 'Mock verification successful',
+      data: true,
+      errors: []
+    } as ApiResponse<boolean>);
+  }
 
 
   getSiteKey(): string {
