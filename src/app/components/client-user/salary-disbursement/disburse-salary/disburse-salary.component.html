@@ -55,7 +55,7 @@
               <option value="">Select Employee</option>
               <option
                 *ngFor="let employee of filteredEmployees"
-                [value]="employee.clientId"
+                [value]="employee.employeeId"
               >
                 {{ employee.fullName }} - {{ employee.email }} ({{
                   formatSalary(employee.salaryAmount)

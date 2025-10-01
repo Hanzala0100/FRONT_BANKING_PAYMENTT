@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { BankUserService } from '../../../../core/services/bank-user.service';
 import { Payment } from '../../../../shared/models/Payment.inteface';
 import { Client } from '../../../../shared/models/Client.interface';
+import { UserStateService } from '../../../../core/services/user-state.service';
 
 
 @Component({
@@ -25,17 +26,23 @@ export class PaymentHistoryComponent implements OnInit {
   selectedClientId = '';
   startDate = '';
   endDate = '';
+  currentUser: any;
+  constructor(
+    private bankUserService: BankUserService,
+    private userStateService: UserStateService,
 
-  constructor(private bankUserService: BankUserService) { }
+  ) { }
 
   ngOnInit() {
+    this.currentUser = this.userStateService.currentUser;
     this.loadPayments();
     this.loadClients();
   }
 
   loadPayments() {
     this.isLoading = true;
-    this.bankUserService.getPendingPayments().subscribe({
+    console.log(this.currentUser);
+    this.bankUserService.getAllPayments(this.currentUser.bankId).subscribe({
       next: (response) => {
         if (response.success) {
           this.allPayments = response.data;
