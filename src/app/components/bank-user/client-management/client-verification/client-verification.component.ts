@@ -80,14 +80,14 @@ export class ClientVerificationComponent implements OnInit {
         next: (response) => {
           if (response.success) {
             this.clientDocuments[client.clientId] = response.data.map((doc: any) => ({
+              documentId: doc.documentId,
               uploadedBy: doc.uploadedBy,
               bankId: doc.bankId,
               fileName: doc.fileName,
               fileUrl: doc.fileUrl,
               uploadedAt: doc.uploadedAt,
               docType: doc.docType,
-              clientId: doc.clientId,
-              id: doc.id
+              clientId: doc.clientId
             }));
           }
         },

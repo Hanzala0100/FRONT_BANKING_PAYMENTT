@@ -51,7 +51,7 @@ export class DocumentListComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.documents = response.data.map((doc: any) => ({
-            id: doc.id,
+            documentId: doc.documentId,
             uploadedBy: doc.uploadedBy,
             bankId: doc.bankId,
             fileName: doc.fileName,
@@ -212,7 +212,7 @@ export class DocumentListComponent implements OnInit {
 
   deleteDocument(document: Document) {
     if (confirm(`Are you sure you want to delete "${document.fileName}"?`)) {
-      this.clientUserService.deleteDocument(document.id!).subscribe({
+      this.clientUserService.deleteDocument(document.documentId!).subscribe({
         next: (response) => {
           if (response.success) {
             this.loadDocuments();
