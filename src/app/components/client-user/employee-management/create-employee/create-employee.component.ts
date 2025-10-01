@@ -1,3 +1,4 @@
+import { UserStateService } from './../../../../core/services/user-state.service';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -18,16 +19,19 @@ export class CreateEmployeeComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-
+  currentUser: any;
   constructor(
     private fb: FormBuilder,
     private clientUserService: ClientUserService,
+    private UuerStateService: UserStateService,
     private router: Router
   ) {
     this.employeeForm = this.createForm();
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.currentUser = this.UuerStateService.currentUser;
+  }
 
   createForm(): FormGroup {
     return this.fb.group({
@@ -53,7 +57,7 @@ export class CreateEmployeeComponent implements OnInit {
     this.successMessage = '';
 
     const employeeData: EmployeeCreateRequest = {
-      clientId: 0, // Will be set from current user context
+      clientId: this.currentUser?.clientId || 0,
       fullName: this.employeeForm.value.fullName.trim(),
       userName: this.employeeForm.value.username.trim(),
       phoneNumber: this.employeeForm.value.phoneNumber.trim(),
