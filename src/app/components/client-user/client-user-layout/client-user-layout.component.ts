@@ -102,6 +102,12 @@ export class ClientUserLayoutComponent implements OnInit {
         { name: 'All Documents', route: '/client-user/documents', icon: 'folder-outline', active: false },
         { name: 'Upload Document', route: '/client-user/documents/upload', icon: 'cloud-upload-outline', active: false }
       ]
+    },
+    {
+      name: 'Reports',
+      route: '/client-user/reports',
+      icon: 'document-text-outline',
+      active: false
     }
   ];
 
