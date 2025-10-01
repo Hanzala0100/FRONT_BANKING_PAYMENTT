@@ -73,7 +73,7 @@
             <h3 class="text-lg font-semibold text-gray-900">
               {{ employee.fullName }}
             </h3>
-            <p class="text-sm text-gray-600">{{ employee.username }}</p>
+            <p class="text-sm text-gray-600">{{ employee.userName }}</p>
           </div>
         </div>
 
@@ -178,43 +178,6 @@
         <div>
           <h3 class="font-medium text-gray-900">Disburse Salary</h3>
           <p class="text-sm text-gray-600">Process salary payment</p>
-        </div>
-      </a>
-
-      <a
-        routerLink="/client-user/payments/create"
-        [queryParams]="{ employeeId: employee.clientId }"
-        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-200 transition-colors group"
-      >
-        <div
-          class="bg-purple-100 p-2 rounded-lg mr-4 group-hover:bg-purple-200 transition-colors"
-        >
-          <ion-icon
-            name="card-outline"
-            class="text-purple-600 text-xl"
-          ></ion-icon>
-        </div>
-        <div>
-          <h3 class="font-medium text-gray-900">Make Payment</h3>
-          <p class="text-sm text-gray-600">Initiate bonus payment</p>
-        </div>
-      </a>
-
-      <a
-        [routerLink]="['/client-user/employees', employeeId, 'edit']"
-        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-colors group"
-      >
-        <div
-          class="bg-blue-100 p-2 rounded-lg mr-4 group-hover:bg-blue-200 transition-colors"
-        >
-          <ion-icon
-            name="create-outline"
-            class="text-blue-600 text-xl"
-          ></ion-icon>
-        </div>
-        <div>
-          <h3 class="font-medium text-gray-900">Update Details</h3>
-          <p class="text-sm text-gray-600">Edit employee information</p>
         </div>
       </a>
     </div>

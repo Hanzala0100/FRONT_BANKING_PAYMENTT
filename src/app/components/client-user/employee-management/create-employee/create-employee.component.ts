@@ -55,7 +55,7 @@ export class CreateEmployeeComponent implements OnInit {
     const employeeData: EmployeeCreateRequest = {
       clientId: 0, // Will be set from current user context
       fullName: this.employeeForm.value.fullName.trim(),
-      username: this.employeeForm.value.username.trim(),
+      userName: this.employeeForm.value.username.trim(),
       phoneNumber: this.employeeForm.value.phoneNumber.trim(),
       email: this.employeeForm.value.email.trim(),
       accountNumber: parseInt(this.employeeForm.value.accountNumber),

@@ -1,218 +1,204 @@
-<div class="p-6 space-y-6">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Employee Management</h1>
-      <p class="text-gray-600 mt-1">Manage and monitor all employees</p>
-    </div>
-    <div class="mt-4 sm:mt-0 flex space-x-3">
-      <a
-        routerLink="/client-user/employees/import"
-        class="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-      >
-        <ion-icon name="cloud-upload-outline" class="mr-2"></ion-icon>
-        Bulk Import
-      </a>
-      <a
-        routerLink="/client-user/employees/create"
-        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-      >
-        <ion-icon name="person-add-outline" class="mr-2"></ion-icon>
-        Add Employee
-      </a>
-    </div>
-  </div>
-
-  <!-- Filters and Search -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <!-- Search -->
-      <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-gray-700 mb-2"
-          >Search Employees</label
-        >
-        <div class="relative">
-          <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-          >
-            <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
-          </div>
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            (input)="applyFilters()"
-            placeholder="Search by name, email, account number..."
-            class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-      </div>
-
-      <!-- Sort -->
-      <div class="md:col-span-2">
-        <label class="block text-sm font-medium text-gray-700 mb-2"
-          >Sort By</label
-        >
-        <select
-          [(ngModel)]="sortBy"
-          (change)="applyFilters()"
-          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="name">Name</option>
-          <option value="salary">Salary (High to Low)</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- Employees Table -->
+<!-- Employees Table -->
+<div
+  class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+>
   <div
-    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+    class="px-6 py-4 border-b border-gray-100 flex justify-between items-center"
   >
-    <div class="px-6 py-4 border-b border-gray-100">
-      <h2 class="text-lg font-semibold text-gray-900">
-        Employees ({{ filteredEmployees.length }})
-      </h2>
+    <h2 class="text-lg font-semibold text-gray-900">
+      Employees ({{ totalRecords }})
+    </h2>
+    <div class="text-sm text-gray-500">
+      Page {{ currentPage }} of {{ totalPages }}
     </div>
+  </div>
 
-    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
-      <table
-        class="min-w-full divide-y divide-gray-200"
-        *ngIf="filteredEmployees.length > 0; else noEmployeesTemplate"
-      >
-        <thead class="bg-gray-50">
-          <tr>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Employee
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Contact
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Bank Details
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Salary
-            </th>
-            <th
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr
-            *ngFor="let employee of filteredEmployees"
-            class="hover:bg-gray-50 transition-colors"
+  <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+    <table
+      class="min-w-full divide-y divide-gray-200"
+      *ngIf="employees.length > 0; else noEmployeesTemplate"
+    >
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >
-            <!-- Employee Details -->
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div
-                  class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mr-3"
-                >
-                  <span class="text-sm font-medium text-white">
-                    {{ getEmployeeInitials(employee.fullName) }}
-                  </span>
-                </div>
-                <div>
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ employee.fullName }}
-                  </div>
-                  <div class="text-sm text-gray-500">
-                    {{ employee.username }}
-                  </div>
-                </div>
-              </div>
-            </td>
-
-            <!-- Contact -->
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ employee.email }}</div>
-              <div class="text-sm text-gray-500">
-                {{ employee.phoneNumber }}
-              </div>
-            </td>
-
-            <!-- Bank Details -->
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">
-                A/C: {{ employee.accountNumber }}
-              </div>
-              <div class="text-sm text-gray-500">
-                {{ employee.bankName }} • {{ employee.ifsccode }}
-              </div>
-            </td>
-
-            <!-- Salary -->
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-semibold text-gray-900">
-                {{ formatSalary(employee.salaryAmount) }}
-              </div>
-            </td>
-
-            <!-- Actions -->
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <div class="flex items-center space-x-3">
-                <a
-                  [routerLink]="['/client-user/employees', employee.employeeId]"
-                  class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
-                >
-                  <ion-icon name="eye-outline" class="mr-1"></ion-icon>
-                  View
-                </a>
-
-                <button
-                  (click)="deleteEmployee(employee)"
-                  class="text-red-600 hover:text-red-900 transition-colors flex items-center"
-                >
-                  <ion-icon name="trash-outline" class="mr-1"></ion-icon>
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <ng-template #noEmployeesTemplate>
-        <div class="text-center py-12">
-          <ion-icon
-            name="people-outline"
-            class="text-6xl text-gray-300 mb-4"
-          ></ion-icon>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">
-            No employees found
-          </h3>
-          <p class="text-gray-500 mb-6">
-            Get started by adding your first employee.
-          </p>
-          <a
-            routerLink="/client-user/employees/create"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            Employee
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
           >
-            <ion-icon name="person-add-outline" class="mr-2"></ion-icon>
-            Add First Employee
-          </a>
-        </div>
-      </ng-template>
-    </div>
+            Contact
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Bank Details
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Salary
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr
+          *ngFor="let employee of employees"
+          class="hover:bg-gray-50 transition-colors"
+        >
+          <!-- Employee Details -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div
+                class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center mr-3"
+              >
+                <span class="text-sm font-medium text-white">
+                  {{ getEmployeeInitials(employee.fullName) }}
+                </span>
+              </div>
+              <div>
+                <div class="text-sm font-medium text-gray-900">
+                  {{ employee.fullName }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ employee.userName || "No username" }}
+                </div>
+              </div>
+            </div>
+          </td>
 
-    <ng-template #loadingTemplate>
+          <!-- Contact -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">{{ employee.email }}</div>
+            <div class="text-sm text-gray-500">
+              {{ employee.phoneNumber }}
+            </div>
+          </td>
+
+          <!-- Bank Details -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">
+              A/C: {{ employee.accountNumber }}
+            </div>
+            <div class="text-sm text-gray-500">
+              {{ employee.bankName }} • {{ employee.ifsccode }}
+            </div>
+          </td>
+
+          <!-- Salary -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-semibold text-gray-900">
+              {{ formatSalary(employee.salaryAmount) }}
+            </div>
+          </td>
+
+          <!-- Actions -->
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <div class="flex items-center space-x-3">
+              <a
+                [routerLink]="['/client-user/employees', employee.employeeId]"
+                class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
+              >
+                <ion-icon name="eye-outline" class="mr-1"></ion-icon>
+                View
+              </a>
+
+              <button
+                (click)="deleteEmployee(employee)"
+                class="text-red-600 hover:text-red-900 transition-colors flex items-center"
+              >
+                <ion-icon name="trash-outline" class="mr-1"></ion-icon>
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noEmployeesTemplate>
       <div class="text-center py-12">
-        <div
-          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-        ></div>
-        <p class="text-gray-500 mt-2">Loading employees...</p>
+        <ion-icon
+          name="people-outline"
+          class="text-6xl text-gray-300 mb-4"
+        ></ion-icon>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">
+          No employees found
+        </h3>
+        <p class="text-gray-500 mb-6">
+          Get started by adding your first employee.
+        </p>
+        <a
+          routerLink="/client-user/employees/create"
+          class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          <ion-icon name="person-add-outline" class="mr-2"></ion-icon>
+          Add First Employee
+        </a>
       </div>
     </ng-template>
   </div>
+
+  <!-- Pagination Controls -->
+  <div
+    class="px-6 py-4 border-t border-gray-100 bg-gray-50"
+    *ngIf="!isLoading && employees.length > 0"
+  >
+    <div class="flex items-center justify-between">
+      <div class="text-sm text-gray-700">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ getEndIndex() }} of
+        {{ totalRecords }} entries
+      </div>
+      <div class="flex space-x-2">
+        <button
+          (click)="onPageChange(currentPage - 1)"
+          [disabled]="!hasPrevious"
+          [class.opacity-50]="!hasPrevious"
+          [class.cursor-not-allowed]="!hasPrevious"
+          class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        <!-- Page Numbers -->
+        <div class="flex space-x-1">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            (click)="onPageChange(page)"
+            [class.bg-blue-600]="page === currentPage"
+            [class.text-white]="page === currentPage"
+            [class.text-gray-700]="page !== currentPage"
+            class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium bg-white hover:bg-gray-50 transition-colors"
+          >
+            {{ page }}
+          </button>
+        </div>
+
+        <button
+          (click)="onPageChange(currentPage + 1)"
+          [disabled]="!hasNext"
+          [class.opacity-50]="!hasNext"
+          [class.cursor-not-allowed]="!hasNext"
+          class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loadingTemplate>
+    <div class="text-center py-12">
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+      ></div>
+      <p class="text-gray-500 mt-2">Loading employees...</p>
+    </div>
+  </ng-template>
 </div>

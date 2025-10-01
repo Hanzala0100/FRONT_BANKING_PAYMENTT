@@ -4,7 +4,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { ApiResponse } from "../../shared/models/ApiResponse.interface";
 import { User, UserCreateRequest } from "../../shared/models/User.interface";
-import { Employee, EmployeeCreateRequest } from "../../shared/models/Employee.interface";
+import { Employee, EmployeeCreateRequest, EmployeePaginatedResponse } from "../../shared/models/Employee.interface";
 import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../../shared/models/Salary.interface";
 import { Beneficiary, BeneficiaryCreateRequest } from "../../shared/models/Beneficiary.interface";
 import { Payment, PaymentCreateRequest } from "../../shared/models/Payment.inteface";
@@ -53,6 +53,22 @@ export class ClientUserService {
     return this.http.get<ApiResponse<Employee[]>>(`${this.baseUrl}/employees`);
   }
 
+
+  getPaginatedEmployees(pageNumber: number, pageSize: number, clientId?: number, searchTerm?: string, sortDescending?: boolean): Observable<ApiResponse<EmployeePaginatedResponse>> {
+    let params = new HttpParams()
+      .set('PageNumber', pageNumber.toString())
+      .set('PageSize', pageSize.toString());
+    if (clientId) {
+      params = params.set('ClientId', clientId.toString());
+    }
+    if (searchTerm) {
+      params = params.set('SearchTerm', searchTerm);
+    }
+    if (sortDescending !== undefined) {
+      params = params.set('SortDescending', sortDescending.toString());
+    }
+    return this.http.get<ApiResponse<EmployeePaginatedResponse>>(`${this.baseUrl}/paginated-employee`, { params });
+  }
   bulkImportEmployees(csvFile: File): Observable<ApiResponse<BulkEmployeeImportResponse>> {
     const formData = new FormData();
     formData.append('csvFile', csvFile);

@@ -1,7 +1,7 @@
 export interface Employee {
   employeeId: number;
   clientId: number;
-  username: string;
+  userName: string;
   fullName: string;
   phoneNumber: string;
   email: string;
@@ -14,7 +14,7 @@ export interface Employee {
 export interface EmployeeCreateRequest {
 
   clientId: number;
-  username: string;
+  userName: string;
   fullName: string;
   phoneNumber: string;
   email: string;
@@ -24,4 +24,21 @@ export interface EmployeeCreateRequest {
   salaryAmount: number;
 }
 
+
+
+
+export interface Pagination {
+  currentPage: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+export interface EmployeePaginatedResponse {
+  data: Employee[];
+  pagination: Pagination;
+  message: string;
+  success: boolean;
+}
 
