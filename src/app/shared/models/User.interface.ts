@@ -1,6 +1,6 @@
 export interface User {
   userId: number;
-  username: string;
+  userName: string;
   fullName: string;
   email: string;
   role: string;
@@ -13,7 +13,7 @@ export interface User {
 export interface UserCreateRequest {
   fullName: string;
   email: string;
-  username: string;
+  userName: string;
   password: string;
   role: string;
   clientId?: number;

@@ -47,7 +47,7 @@ export class ClientUserLayoutComponent implements OnInit {
       ]
     },
     {
-      name: 'Employee Management',
+      name: 'Employee Mgmt',
       route: '/client-user/employees',
       icon: 'people-circle-outline',
       active: false,
