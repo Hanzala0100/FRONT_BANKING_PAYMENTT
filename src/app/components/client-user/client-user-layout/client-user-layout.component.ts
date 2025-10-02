@@ -35,17 +35,17 @@ export class ClientUserLayoutComponent implements OnInit {
       icon: 'grid-outline',
       active: false
     },
-    {
-      name: 'User Management',
-      route: '/client-user/users',
-      icon: 'people-outline',
-      active: false,
-      isExpanded: false,
-      children: [
-        { name: 'All Users', route: '/client-user/users', icon: 'list-outline', active: false },
-        { name: 'Add User', route: '/client-user/users/create', icon: 'person-add-outline', active: false }
-      ]
-    },
+    // {
+    //   name: 'User Management',
+    //   route: '/client-user/users',
+    //   icon: 'people-outline',
+    //   active: false,
+    //   isExpanded: false,
+    //   children: [
+    //     { name: 'All Users', route: '/client-user/users', icon: 'list-outline', active: false },
+    //     { name: 'Add User', route: '/client-user/users/create', icon: 'person-add-outline', active: false }
+    //   ]
+    // },
     {
       name: 'Employee Mgmt',
       route: '/client-user/employees',

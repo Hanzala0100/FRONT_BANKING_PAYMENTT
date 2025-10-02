@@ -26,7 +26,7 @@ export class CreateBeneficiaryComponent implements OnInit {
     this.beneficiaryForm = this.createForm();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   createForm(): FormGroup {
     return this.fb.group({
@@ -52,7 +52,7 @@ export class CreateBeneficiaryComponent implements OnInit {
       fullName: this.beneficiaryForm.value.fullName.trim(),
       accountNumber: parseInt(this.beneficiaryForm.value.accountNumber),
       bankName: this.beneficiaryForm.value.bankName.trim(),
-      ifscCode: this.beneficiaryForm.value.ifscCode.trim().toUpperCase()
+      ifsccode: this.beneficiaryForm.value.ifscCode.trim().toUpperCase()
     };
 
     this.clientUserService.createBeneficiary(beneficiaryData).subscribe({

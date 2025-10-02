@@ -205,7 +205,7 @@
                 {{ beneficiary.bankName }}
               </div>
               <div class="text-sm text-gray-500">
-                {{ beneficiary.ifscCode }}
+                {{ beneficiary.ifsccode }}
               </div>
             </td>
 
@@ -241,7 +241,7 @@
             <!-- Actions -->
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <div class="flex items-center space-x-3">
-                <a
+                <!-- <a
                   [routerLink]="[
                     '/client-user/beneficiaries',
                     beneficiary.beneficiaryId
@@ -251,7 +251,7 @@
                 >
                   <ion-icon name="eye-outline" class="mr-1"></ion-icon>
                   View
-                </a>
+                </a> -->
 
                 <a
                   routerLink="/client-user/payments/create"

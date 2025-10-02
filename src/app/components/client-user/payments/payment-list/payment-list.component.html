@@ -318,14 +318,14 @@
             <!-- Actions -->
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <div class="flex items-center space-x-3">
-                <a
+                <!-- <a
                   [routerLink]="['/client-user/payments', payment.paymentId]"
                   class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
                   title="View Details"
                 >
                   <ion-icon name="eye-outline" class="mr-1"></ion-icon>
                   View
-                </a>
+                </a> -->
 
                 <a
                   *ngIf="payment.status === 'Pending'"

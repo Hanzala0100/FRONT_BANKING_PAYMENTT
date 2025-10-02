@@ -54,7 +54,7 @@ export class BeneficiaryListComponent implements OnInit {
         beneficiary.fullName.toLowerCase().includes(search) ||
         beneficiary.accountNumber.toString().includes(search) ||
         beneficiary.bankName.toLowerCase().includes(search) ||
-        beneficiary.ifscCode.toLowerCase().includes(search)
+        beneficiary.ifsccode.toLowerCase().includes(search)
       );
     }
 
