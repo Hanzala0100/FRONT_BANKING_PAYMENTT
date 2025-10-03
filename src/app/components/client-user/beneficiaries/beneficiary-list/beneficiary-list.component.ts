@@ -1,9 +1,11 @@
+import { Client } from './../../../../shared/models/Client.interface';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Beneficiary } from '../../../../shared/models/Beneficiary.interface';
 import { ClientUserService } from '../../../../core/services/client-user.service';
+import { UserStateService } from '../../../../core/services/user-state.service';
 
 @Component({
   selector: 'app-beneficiary-list',
@@ -17,23 +19,40 @@ export class BeneficiaryListComponent implements OnInit {
   filteredBeneficiaries: Beneficiary[] = [];
   isLoading = true;
 
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalRecords = 0;
+  totalPages = 0;
+  currentUser: any;
   // Filters
   searchTerm = '';
   sortBy = 'name';
+  sortDescending = false;
 
-  constructor(private clientUserService: ClientUserService) { }
+  constructor(private clientUserService: ClientUserService, private userStateService: UserStateService) { }
 
   ngOnInit() {
+    this.currentUser = this.userStateService.currentUser;
     this.loadBeneficiaries();
   }
 
   loadBeneficiaries() {
     this.isLoading = true;
-    this.clientUserService.getBeneficiaries().subscribe({
+    const clientId = this.currentUser?.clientId || 0;
+    this.clientUserService.getPaginatedBeneficiaries(
+      this.currentPage,
+      this.pageSize,
+      clientId,
+      this.searchTerm,
+      this.sortDescending
+    ).subscribe({
       next: (response) => {
         if (response.success) {
-          this.beneficiaries = response.data;
+          this.beneficiaries = response.data.data;
           this.filteredBeneficiaries = [...this.beneficiaries];
+          this.totalRecords = response.data.pagination.totalCount;
+          this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         }
         this.isLoading = false;
       },
@@ -44,31 +63,25 @@ export class BeneficiaryListComponent implements OnInit {
     });
   }
 
-  applyFilters() {
-    let filtered = [...this.beneficiaries];
+  onSearch() {
+    this.currentPage = 1; // Reset to first page when searching
+    this.loadBeneficiaries();
+  }
 
-    // Search filter
-    if (this.searchTerm.trim()) {
-      const search = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(beneficiary =>
-        beneficiary.fullName.toLowerCase().includes(search) ||
-        beneficiary.accountNumber.toString().includes(search) ||
-        beneficiary.bankName.toLowerCase().includes(search) ||
-        beneficiary.ifsccode.toLowerCase().includes(search)
-      );
-    }
+  onSortChange() {
+    this.currentPage = 1; // Reset to first page when sorting
+    this.sortDescending = this.sortBy === 'payments'; // Sort descending for payments, ascending for others
+    this.loadBeneficiaries();
+  }
 
-    // Sort
-    filtered.sort((a, b) => {
-      switch (this.sortBy) {
-        case 'name': return a.fullName.localeCompare(b.fullName);
-        case 'bank': return a.bankName.localeCompare(b.bankName);
-        case 'payments': return b.totalPayments - a.totalPayments;
-        default: return 0;
-      }
-    });
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.loadBeneficiaries();
+  }
 
-    this.filteredBeneficiaries = filtered;
+  onPageSizeChange() {
+    this.currentPage = 1; // Reset to first page when changing page size
+    this.loadBeneficiaries();
   }
 
   deleteBeneficiary(beneficiary: Beneficiary) {
@@ -76,7 +89,7 @@ export class BeneficiaryListComponent implements OnInit {
       this.clientUserService.deleteBeneficiary(beneficiary.beneficiaryId).subscribe({
         next: (response) => {
           if (response.success) {
-            this.loadBeneficiaries();
+            this.loadBeneficiaries(); // Reload current page after deletion
           }
         },
         error: (error) => console.error('Error deleting beneficiary:', error)
@@ -96,6 +109,7 @@ export class BeneficiaryListComponent implements OnInit {
   getPaymentCountText(count: number): string {
     return count === 1 ? '1 payment' : `${count} payments`;
   }
+
   getTotalPayments(): number {
     return this.beneficiaries.reduce((total, beneficiary) => total + beneficiary.totalPayments, 0);
   }
@@ -125,5 +139,24 @@ export class BeneficiaryListComponent implements OnInit {
     const total = this.getTotalPayments();
     const count = this.beneficiaries.length;
     return count > 0 ? (total / count).toFixed(1) : '0';
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust start page if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
 }

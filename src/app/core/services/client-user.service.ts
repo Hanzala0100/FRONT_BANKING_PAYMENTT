@@ -6,7 +6,7 @@ import { ApiResponse } from "../../shared/models/ApiResponse.interface";
 import { User, UserCreateRequest } from "../../shared/models/User.interface";
 import { Employee, EmployeeCreateRequest, EmployeePaginatedResponse } from "../../shared/models/Employee.interface";
 import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../../shared/models/Salary.interface";
-import { Beneficiary, BeneficiaryCreateRequest } from "../../shared/models/Beneficiary.interface";
+import { Beneficiary, BeneficiaryCreateRequest, BeneficiaryPaginatedData } from "../../shared/models/Beneficiary.interface";
 import { Payment, PaymentCreateRequest } from "../../shared/models/Payment.inteface";
 
 @Injectable({
@@ -97,6 +97,22 @@ export class ClientUserService {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/beneficiaries/${beneficiaryId}`);
   }
 
+  getPaginatedBeneficiaries(pageNumber: number, pageSize: number, clientId?: number, searchTerm?: string, sortDescending?: boolean): Observable<ApiResponse<BeneficiaryPaginatedData>> {
+    let params = new HttpParams()
+      .set('PageNumber', pageNumber.toString())
+      .set('PageSize', pageSize.toString());
+    if (clientId) {
+      params = params.set('ClientId', clientId.toString());
+    }
+    if (searchTerm) {
+      params = params.set('SearchTerm', searchTerm);
+    }
+    if (sortDescending !== undefined) {
+      params = params.set('SortDescending', sortDescending.toString());
+    }
+    return this.http.get<ApiResponse<BeneficiaryPaginatedData>>(`${this.baseUrl}/paginated-beneficiary`, { params });
+  }
+
   // PAYMENT MANAGEMENT
 
   createPayment(paymentData: PaymentCreateRequest): Observable<ApiResponse<Payment>> {
@@ -114,6 +130,8 @@ export class ClientUserService {
   deletePayment(paymentId: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/payments/${paymentId}`);
   }
+
+
 
   // SALARY DISBURSEMENT
 

@@ -1,3 +1,5 @@
+import { Pagination } from "./Employee.interface";
+
 export interface Beneficiary {
   beneficiaryId: number;
   clientId: number;
@@ -15,3 +17,13 @@ export interface BeneficiaryCreateRequest {
   bankName: string;
   ifsccode: string;
 }
+
+export interface BeneficiaryPaginatedData {
+  data: Beneficiary[];
+  pagination: Pagination;
+  message: string;
+  success: boolean;
+}
+
+
+

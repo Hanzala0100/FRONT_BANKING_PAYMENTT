@@ -33,26 +33,49 @@
           <input
             type="text"
             [(ngModel)]="searchTerm"
-            (input)="applyFilters()"
+            (keyup.enter)="onSearch()"
             placeholder="Search by name, account number, bank, IFSC..."
             class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
+          <button
+            (click)="onSearch()"
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+          >
+            Search
+          </button>
         </div>
       </div>
 
       <!-- Sort -->
-      <div class="md:col-span-2">
+      <div>
         <label class="block text-sm font-medium text-gray-700 mb-2"
           >Sort By</label
         >
         <select
           [(ngModel)]="sortBy"
-          (change)="applyFilters()"
+          (change)="onSortChange()"
           class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
         >
           <option value="name">Name (A-Z)</option>
           <option value="bank">Bank Name</option>
           <option value="payments">Payment Count</option>
+        </select>
+      </div>
+
+      <!-- Page Size -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Page Size</label
+        >
+        <select
+          [(ngModel)]="pageSize"
+          (change)="onPageSizeChange()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        >
+          <option value="5">5 per page</option>
+          <option value="10">10 per page</option>
+          <option value="20">20 per page</option>
+          <option value="50">50 per page</option>
         </select>
       </div>
     </div>
@@ -71,7 +94,7 @@
         <div class="ml-3">
           <p class="text-sm text-gray-600">Total Beneficiaries</p>
           <p class="text-xl font-semibold text-gray-900">
-            {{ beneficiaries.length }}
+            {{ totalRecords }}
           </p>
         </div>
       </div>
@@ -133,10 +156,15 @@
   <div
     class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
   >
-    <div class="px-6 py-4 border-b border-gray-100">
+    <div
+      class="px-6 py-4 border-b border-gray-100 flex justify-between items-center"
+    >
       <h2 class="text-lg font-semibold text-gray-900">
-        Beneficiaries ({{ filteredBeneficiaries.length }})
+        Beneficiaries ({{ totalRecords }} total)
       </h2>
+      <div class="text-sm text-gray-500">
+        Showing {{ filteredBeneficiaries.length }} of {{ totalRecords }}
+      </div>
     </div>
 
     <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
@@ -241,18 +269,6 @@
             <!-- Actions -->
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
               <div class="flex items-center space-x-3">
-                <!-- <a
-                  [routerLink]="[
-                    '/client-user/beneficiaries',
-                    beneficiary.beneficiaryId
-                  ]"
-                  class="text-blue-600 hover:text-blue-900 transition-colors flex items-center"
-                  title="View Details"
-                >
-                  <ion-icon name="eye-outline" class="mr-1"></ion-icon>
-                  View
-                </a> -->
-
                 <a
                   routerLink="/client-user/payments/create"
                   [queryParams]="{ beneficiaryId: beneficiary.beneficiaryId }"
@@ -287,7 +303,10 @@
           <h3 class="text-lg font-medium text-gray-900 mb-2">
             No beneficiaries found
           </h3>
-          <p class="text-gray-500 mb-6">
+          <p class="text-gray-500 mb-6" *ngIf="searchTerm">
+            No beneficiaries match your search criteria.
+          </p>
+          <p class="text-gray-500 mb-6" *ngIf="!searchTerm">
             Get started by adding your first payment beneficiary.
           </p>
           <a
@@ -310,6 +329,50 @@
         <p class="text-gray-500 mt-2">Loading beneficiaries...</p>
       </div>
     </ng-template>
+
+    <!-- Pagination -->
+    <div
+      class="px-6 py-4 border-t border-gray-200 bg-gray-50"
+      *ngIf="totalPages > 1"
+    >
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Page {{ currentPage }} of {{ totalPages }}
+        </div>
+        <div class="flex space-x-2">
+          <!-- Previous Button -->
+          <button
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1"
+            class="px-3 py-1 rounded border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+          >
+            Previous
+          </button>
+
+          <!-- Page Numbers -->
+          <ng-container *ngFor="let page of getPageNumbers()">
+            <button
+              (click)="onPageChange(page)"
+              [class.bg-green-600]="page === currentPage"
+              [class.text-white]="page === currentPage"
+              [class.text-gray-700]="page !== currentPage"
+              class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              {{ page }}
+            </button>
+          </ng-container>
+
+          <!-- Next Button -->
+          <button
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+            class="px-3 py-1 rounded border border-gray-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Quick Stats -->
