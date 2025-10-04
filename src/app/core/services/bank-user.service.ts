@@ -10,97 +10,99 @@ import { Client, ClientCreateRequest, ClientUserCreateRequest } from "../../shar
 import { VerificationStatus } from "../../shared/enums/Verification-status.enum";
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class BankUserService {
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    private baseUrl = environment.apiUrl + '/BankUser';
+  private baseUrl = environment.apiUrl + '/BankUser';
 
-    // CLIENT MANAGEMENT
+  // CLIENT MANAGEMENT
 
-    createClient(clientData: ClientCreateRequest): Observable<ApiResponse<Client>> {
-        return this.http.post<ApiResponse<Client>>(`${this.baseUrl}/clients`, clientData);
-    }
+  createClient(clientData: ClientCreateRequest): Observable<ApiResponse<Client>> {
+    return this.http.post<ApiResponse<Client>>(`${this.baseUrl}/clients`, clientData);
+  }
 
-    getAllClients(): Observable<ApiResponse<Client[]>> {
-        return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients`);
-    }
+  getAllClients(): Observable<ApiResponse<Client[]>> {
+    return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients`);
+  }
 
-    getClientById(clientId: number): Observable<ApiResponse<Client>> {
-        return this.http.get<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}`);
-    }
+  getClientById(clientId: number): Observable<ApiResponse<Client>> {
+    return this.http.get<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}`);
+  }
 
-    updateClient(clientId: number, clientData: Client): Observable<ApiResponse<Client>> {
-        return this.http.put<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}`, clientData);
-    }
+  updateClient(clientId: number, clientData: Client): Observable<ApiResponse<Client>> {
+    return this.http.put<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}`, clientData);
+  }
 
-    deleteClient(clientId: number): Observable<ApiResponse<boolean>> {
-        return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/clients/${clientId}`);
-    }
+  deleteClient(clientId: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/clients/${clientId}`);
+  }
 
-    // CLIENT VERIFICATION
+  // CLIENT VERIFICATION
 
-    verifyClient(clientId: number, request: ClientVerificationRequest): Observable<ApiResponse<Client>> {
-        return this.http.put<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}/verify`, request);
-    }
+  verifyClient(clientId: number, request: ClientVerificationRequest): Observable<ApiResponse<Client>> {
+    return this.http.put<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}/verify`, request);
+  }
 
-    getClientsByVerificationStatus(status: VerificationStatus): Observable<ApiResponse<Client[]>> {
-        return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients/verification-status/${status}`);
-    }
+  getClientsByVerificationStatus(status: VerificationStatus): Observable<ApiResponse<Client[]>> {
+    return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients/verification-status/${status}`);
+  }
 
-    getClientsWithPendingVerification(): Observable<ApiResponse<Client[]>> {
-        return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients/pending-verification`);
-    }
+  getClientsWithPendingVerification(): Observable<ApiResponse<Client[]>> {
+    return this.http.get<ApiResponse<Client[]>>(`${this.baseUrl}/clients/pending-verification`);
+  }
 
-    // CLIENT DOCUMENTS
+  // CLIENT DOCUMENTS
 
-    uploadClientDocument(clientId: number, documentData: FormData): Observable<ApiResponse<Document>> {
-        return this.http.post<ApiResponse<Document>>(`${this.baseUrl}/clients/${clientId}/documents`, documentData);
-    }
+  uploadClientDocument(clientId: number, documentData: FormData): Observable<ApiResponse<Document>> {
+    return this.http.post<ApiResponse<Document>>(`${this.baseUrl}/clients/${clientId}/documents`, documentData);
+  }
 
-    getClientDocuments(clientId: number): Observable<ApiResponse<Document[]>> {
-        return this.http.get<ApiResponse<Document[]>>(`${this.baseUrl}/clients/${clientId}/documents`);
-    }
+  getClientDocuments(clientId: number): Observable<ApiResponse<Document[]>> {
+    return this.http.get<ApiResponse<Document[]>>(`${this.baseUrl}/clients/${clientId}/documents`);
+  }
 
-    // CLIENT USER MANAGEMENT
+  // CLIENT USER MANAGEMENT
 
-    createClientUser(clientId: number, userData: UserCreateRequest): Observable<ApiResponse<ClientUserCreateRequest>> {
-        return this.http.post<ApiResponse<ClientUserCreateRequest>>(`${this.baseUrl}/clients/${clientId}/users`, userData);
-    }
+  createClientUser(clientId: number, userData: UserCreateRequest): Observable<ApiResponse<ClientUserCreateRequest>> {
+    return this.http.post<ApiResponse<ClientUserCreateRequest>>(`${this.baseUrl}/clients/${clientId}/users`, userData);
+  }
 
-    getClientUsers(clientId: number): Observable<ApiResponse<User[]>> {
-        return this.http.get<ApiResponse<User[]>>(`${this.baseUrl}/clients/${clientId}/users`);
-    }
+  getClientUsers(clientId: number): Observable<ApiResponse<User[]>> {
+    return this.http.get<ApiResponse<User[]>>(`${this.baseUrl}/clients/${clientId}/users`);
+  }
 
-    getClientUserById(clientId: number, userId: number): Observable<ApiResponse<User>> {
-        return this.http.get<ApiResponse<User>>(`${this.baseUrl}/clients/${clientId}/users/${userId}`);
-    }
+  getClientUserById(clientId: number, userId: number): Observable<ApiResponse<User>> {
+    return this.http.get<ApiResponse<User>>(`${this.baseUrl}/clients/${clientId}/users/${userId}`);
+  }
 
-    deleteClientUser(clientId: number, userId: number): Observable<ApiResponse<boolean>> {
-        return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/clients/${clientId}/users/${userId}`);
-    }
+  deleteClientUser(clientId: number, userId: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/clients/${clientId}/users/${userId}`);
+  }
 
-    // PAYMENT MANAGEMENT
+  // PAYMENT MANAGEMENT
 
-    getPendingPayments(): Observable<ApiResponse<Payment[]>> {
-        return this.http.get<ApiResponse<Payment[]>>(`${this.baseUrl}/payments/pending`);
-    }
+  getPendingPayments(): Observable<ApiResponse<Payment[]>> {
+    return this.http.get<ApiResponse<Payment[]>>(`${this.baseUrl}/payments/pending`);
+  }
 
-    getPaymentsByStatus(status: string): Observable<ApiResponse<Payment[]>> {
-        const params = new HttpParams().set('status', status);
-        return this.http.get<ApiResponse<Payment[]>>(`${this.baseUrl}/payments`, { params });
-    }
+  getPaymentsByStatus(status: string): Observable<ApiResponse<Payment[]>> {
+    const params = new HttpParams().set('status', status);
+    return this.http.get<ApiResponse<Payment[]>>(`${this.baseUrl}/payments`, { params });
+  }
+  getAllPayments(BankId: number): Observable<ApiResponse<Payment[]>> {
+    return this.http.post<ApiResponse<Payment[]>>(`${this.baseUrl}/payments/all?BankId=${BankId}`, {});
+  }
+  getPaymentById(paymentId: number): Observable<ApiResponse<Payment>> {
+    return this.http.get<ApiResponse<Payment>>(`${this.baseUrl}/payments/${paymentId}`);
+  }
 
-    getPaymentById(paymentId: number): Observable<ApiResponse<Payment>> {
-        return this.http.get<ApiResponse<Payment>>(`${this.baseUrl}/payments/${paymentId}`);
-    }
+  approvePayment(paymentId: number, request: PaymentApprovalRequest): Observable<ApiResponse<Payment>> {
+    return this.http.put<ApiResponse<Payment>>(`${this.baseUrl}/payments/${paymentId}/approve`, request);
+  }
 
-    approvePayment(paymentId: number, request: PaymentApprovalRequest): Observable<ApiResponse<Payment>> {
-        return this.http.put<ApiResponse<Payment>>(`${this.baseUrl}/payments/${paymentId}/approve`, request);
-    }
-
-    rejectPayment(paymentId: number, request: PaymentApprovalRequest): Observable<ApiResponse<Payment>> {
-        return this.http.put<ApiResponse<Payment>>(`${this.baseUrl}/payments/${paymentId}/reject`, request);
-    }
+  rejectPayment(paymentId: number, request: PaymentApprovalRequest): Observable<ApiResponse<Payment>> {
+    return this.http.put<ApiResponse<Payment>>(`${this.baseUrl}/payments/${paymentId}/reject`, request);
+  }
 }

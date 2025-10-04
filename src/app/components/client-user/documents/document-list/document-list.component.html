@@ -1,1 +1,318 @@
-<p>document-list works!</p>
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Document Management</h1>
+      <p class="text-gray-600 mt-1">Manage and organize your documents</p>
+    </div>
+    <div class="mt-4 sm:mt-0 flex space-x-3">
+      <button
+        (click)="loadDocuments()"
+        class="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+      >
+        <ion-icon name="refresh-outline" class="mr-2"></ion-icon>
+        Refresh
+      </button>
+      <a
+        routerLink="/client-user/documents/upload"
+        class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="cloud-upload-outline" class="mr-2"></ion-icon>
+        Upload Document
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Search -->
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Search Documents</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+          >
+            <ion-icon name="search-outline" class="text-gray-400"></ion-icon>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+            placeholder="Search by file name, document type..."
+            class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <!-- Document Type Filter -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Document Type</label
+        >
+        <select
+          [(ngModel)]="selectedDocType"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        >
+          <option *ngFor="let option of docTypeOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sort -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"
+          >Sort By</label
+        >
+        <select
+          [(ngModel)]="sortBy"
+          (change)="applyFilters()"
+          class="block w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+        >
+          <option *ngFor="let option of sortOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-indigo-100 p-3 rounded-lg">
+          <ion-icon
+            name="folder-outline"
+            class="text-indigo-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Documents</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ documents.length }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <ion-icon
+            name="document-text-outline"
+            class="text-purple-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Size</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ getTotalSize() }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <ion-icon
+            name="card-outline"
+            class="text-blue-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">PAN Cards</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ getDocTypeCount("PAN") }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div class="flex items-center">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <ion-icon
+            name="id-card-outline"
+            class="text-green-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Aadhar Cards</p>
+          <p class="text-2xl font-bold text-gray-900">
+            {{ getDocTypeCount("Aadhar") }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents Grid -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+    <div class="px-6 py-4 border-b border-gray-100">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">
+          Documents ({{ filteredDocuments.length }})
+        </h2>
+        <div class="text-sm text-gray-500">
+          Showing {{ filteredDocuments.length }} of
+          {{ documents.length }} documents
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto" *ngIf="!isLoading; else loadingTemplate">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6"
+        *ngIf="filteredDocuments.length > 0; else noDocumentsTemplate"
+      >
+        <div
+          *ngFor="let document of filteredDocuments"
+          class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow"
+        >
+          <!-- Document Header -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div
+                class="p-3 rounded-lg"
+                [ngClass]="getFileTypeColor(document.fileName)"
+              >
+                <ion-icon
+                  [name]="getFileIcon(document.fileName)"
+                  class="text-lg"
+                ></ion-icon>
+              </div>
+              <div>
+                <span
+                  class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
+                  [ngClass]="getDocTypeBadgeClass(document.docType)"
+                >
+                  <ion-icon
+                    [name]="getDocTypeIcon(document.docType)"
+                    class="mr-1 text-xs"
+                  ></ion-icon>
+                  {{ document.docType || "Unknown" }}
+                </span>
+              </div>
+            </div>
+            <div class="dropdown relative">
+              <button
+                class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ion-icon name="ellipsis-vertical" class="text-lg"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Document Info -->
+          <div class="space-y-3">
+            <h3
+              class="font-medium text-gray-900 truncate"
+              title="{{ document.fileName }}"
+            >
+              {{ document.fileName }}
+            </h3>
+
+            <div class="space-y-2 text-sm text-gray-600">
+              <div class="flex items-center">
+                <ion-icon
+                  name="time-outline"
+                  class="mr-2 text-gray-400"
+                ></ion-icon>
+                <span>{{ formatDate(document.uploadedAt) }}</span>
+              </div>
+              <div class="flex items-center">
+                <ion-icon
+                  name="document-attach-outline"
+                  class="mr-2 text-gray-400"
+                ></ion-icon>
+                <span>{{ formatFileSize(1024 * 1024) }}</span>
+                <!-- Mock size -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div
+            class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100"
+          >
+            <button
+              (click)="downloadDocument(document)"
+              class="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium transition-colors"
+            >
+              <ion-icon name="download-outline" class="mr-1"></ion-icon>
+              Download
+            </button>
+
+            <button
+              (click)="deleteDocument(document)"
+              class="flex items-center text-red-600 hover:text-red-700 text-sm font-medium transition-colors"
+            >
+              <ion-icon name="trash-outline" class="mr-1"></ion-icon>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Documents Template -->
+      <ng-template #noDocumentsTemplate>
+        <div class="text-center py-12">
+          <ion-icon
+            name="folder-open-outline"
+            class="text-6xl text-gray-300 mb-4"
+          ></ion-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">
+            No documents found
+          </h3>
+          <p class="text-gray-500 mb-6">
+            No documents match your current filters.
+          </p>
+          <a
+            routerLink="/client-user/documents/upload"
+            class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+          >
+            <ion-icon name="cloud-upload-outline" class="mr-2"></ion-icon>
+            Upload First Document
+          </a>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Loading Template -->
+    <ng-template #loadingTemplate>
+      <div class="text-center py-12">
+        <div
+          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"
+        ></div>
+        <p class="text-gray-500 mt-2">Loading documents...</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Document Type Summary -->
+  <div
+    *ngIf="documents.length > 0"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+  >
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Document Types</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div
+        *ngFor="let docType of docTypeOptions.slice(1)"
+        class="text-center p-4 border border-gray-200 rounded-lg"
+      >
+        <div class="text-2xl font-bold text-gray-900">
+          {{ getDocTypeCount(docType.value) }}
+        </div>
+        <p class="text-sm text-gray-600">{{ docType.label }}</p>
+      </div>
+    </div>
+  </div>
+</div>

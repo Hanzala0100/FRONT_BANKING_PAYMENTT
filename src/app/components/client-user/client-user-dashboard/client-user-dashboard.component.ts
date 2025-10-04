@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ClientUserService } from '../../../core/services/client-user.service';
 import { UserStateService } from '../../../core/services/user-state.service';
+import { VerificationStatus } from '../../../shared/enums/Verification-status.enum';
 
 @Component({
   selector: 'app-client-user-dashboard',
@@ -23,6 +24,8 @@ export class ClientUserDashboardComponent implements OnInit {
 
   recentActivities: any[] = [];
   isLoading = true;
+  currentClient: any = null;
+  isVerified = false;
 
   constructor(
     private clientUserService: ClientUserService,
@@ -30,12 +33,44 @@ export class ClientUserDashboardComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.loadDashboardData();
+    this.loadClientData();
+  }
+
+  loadClientData() {
+    const currentUser = this.userStateService.currentUser;
+
+    if (currentUser?.clientId) {
+      this.clientUserService.getClientById(currentUser.clientId).subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.currentClient = response.data;
+            this.isVerified = this.currentClient.verificationStatus === VerificationStatus.Verified;
+
+            if (this.isVerified) {
+              this.loadDashboardData();
+            } else {
+              this.isLoading = false;
+            }
+          } else {
+            this.isLoading = false;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading client data:', error);
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.isLoading = false;
+    }
   }
 
   loadDashboardData() {
     this.isLoading = true;
-
+    if (!this.isVerified) {
+      this.isLoading = false;
+      return;
+    }
     // Load employees count
     this.clientUserService.getAllEmployees().subscribe({
       next: (response) => {

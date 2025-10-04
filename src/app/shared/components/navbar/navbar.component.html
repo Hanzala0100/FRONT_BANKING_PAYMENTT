@@ -35,18 +35,18 @@
       <!-- Right Section - User Info and Actions -->
       <div class="flex items-center space-x-4">
         <!-- Notifications (Optional) -->
-        <button
+        <!-- <button
           class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors relative"
         >
           <ion-icon
             name="notifications-outline"
             class="text-gray-600 text-lg"
           ></ion-icon>
-          <!-- Notification Badge -->
+
           <span
             class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"
           ></span>
-        </button>
+        </button> -->
 
         <!-- User Profile Section -->
         <div class="relative" #userMenuRef>
@@ -138,15 +138,15 @@
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-gray-600">Username:</span>
                   <span class="text-sm font-medium text-gray-900">{{
-                    currentUser?.username
+                    currentUser?.userName
                   }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Menu Items -->
-            <div class="py-2">
-              <!-- Profile Settings -->
+            <!-- <div class="py-2">
+
               <button
                 class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
@@ -157,7 +157,7 @@
                 Profile Settings
               </button>
 
-              <!-- Security -->
+
               <button
                 class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
@@ -168,7 +168,7 @@
                 Security
               </button>
 
-              <!-- Help -->
+
               <button
                 class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
@@ -178,7 +178,7 @@
                 ></ion-icon>
                 Help & Support
               </button>
-            </div>
+            </div> -->
 
             <!-- Logout Section -->
             <div class="border-t border-gray-100 pt-2">

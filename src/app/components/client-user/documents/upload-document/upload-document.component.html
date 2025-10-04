@@ -1,1 +1,340 @@
-<p>upload-document works!</p>
+<div class="p-6 max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4 mb-4">
+      <a
+        routerLink="/client-user/documents"
+        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          class="text-lg text-gray-600"
+        ></ion-icon>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Upload Document</h1>
+        <p class="text-gray-600">Upload and categorize your documents</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Upload Form -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <form
+          [formGroup]="uploadForm"
+          (ngSubmit)="onSubmit()"
+          class="space-y-6"
+        >
+          <!-- Document Information -->
+          <div class="space-y-6">
+            <div class="border-b border-gray-200 pb-4">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <ion-icon
+                  name="document-text-outline"
+                  class="mr-2 text-indigo-600"
+                ></ion-icon>
+                Document Information
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">
+                Categorize your document for better organization
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6">
+              <!-- Document Type -->
+              <div>
+                <label
+                  for="docType"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Document Type <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="docType"
+                  formControlName="docType"
+                  class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+                  [class.border-red-300]="isFieldInvalid('docType')"
+                >
+                  <option value="">Select Document Type</option>
+                  <option
+                    *ngFor="let option of docTypeOptions"
+                    [value]="option.value"
+                  >
+                    {{ option.label }}
+                  </option>
+                </select>
+                <div
+                  *ngIf="isFieldInvalid('docType')"
+                  class="text-red-600 text-sm mt-1 flex items-center"
+                >
+                  <ion-icon
+                    name="alert-circle-outline"
+                    class="mr-1 text-sm"
+                  ></ion-icon>
+                  Please select a document type
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div>
+                <label
+                  for="description"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Description (Optional)
+                </label>
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Add a description for this document..."
+                  class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors resize-none"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- File Upload Area -->
+          <div class="space-y-4">
+            <div class="border-b border-gray-200 pb-4">
+              <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <ion-icon
+                  name="cloud-upload-outline"
+                  class="mr-2 text-indigo-600"
+                ></ion-icon>
+                Upload File
+              </h2>
+              <p class="text-sm text-gray-600 mt-1">
+                Select the document file to upload
+              </p>
+            </div>
+
+            <div
+              class="file-upload p-8 text-center border-2 border-dashed border-gray-300 rounded-lg transition-colors"
+              [class.border-indigo-500]="isDragging"
+              [class.bg-indigo-50]="isDragging"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <input
+                type="file"
+                #fileInput
+                (change)="onFileSelected($event)"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
+                class="hidden"
+              />
+
+              <div
+                class="max-w-md mx-auto"
+                *ngIf="!selectedFile; else fileSelectedTemplate"
+              >
+                <ion-icon
+                  name="cloud-upload-outline"
+                  class="text-4xl text-gray-400 mb-4"
+                ></ion-icon>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">
+                  Upload Document
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                  Drag & drop your file here or click to browse
+                </p>
+                <button
+                  type="button"
+                  (click)="fileInput.click()"
+                  class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors"
+                >
+                  <ion-icon name="folder-open-outline" class="mr-2"></ion-icon>
+                  Select File
+                </button>
+                <p class="text-xs text-gray-500 mt-3">
+                  Maximum file size: 10MB • Supported: PDF, Word, Excel, Images
+                </p>
+              </div>
+
+              <ng-template #fileSelectedTemplate>
+                <div class="text-center">
+                  <div class="bg-indigo-100 p-3 rounded-full inline-flex mb-4">
+                    <ion-icon
+                      [name]="getFileIcon()"
+                      class="text-indigo-600 text-2xl"
+                    ></ion-icon>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-1">
+                    {{ selectedFile!.name }}
+                  </h3>
+                  <p class="text-sm text-gray-600 mb-4">
+                    {{ formatFileSize(selectedFile!.size) }}
+                  </p>
+                  <button
+                    type="button"
+                    (click)="removeFile()"
+                    class="text-red-600 hover:text-red-700 text-sm font-medium flex items-center justify-center mx-auto"
+                  >
+                    <ion-icon
+                      name="close-circle-outline"
+                      class="mr-1"
+                    ></ion-icon>
+                    Remove File
+                  </button>
+                </div>
+              </ng-template>
+            </div>
+
+            <!-- Upload Progress -->
+            <div *ngIf="isUploading" class="space-y-2">
+              <div class="flex justify-between text-sm text-gray-600">
+                <span>Uploading...</span>
+                <span>{{ uploadProgress }}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  class="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                  [style.width]="uploadProgress + '%'"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div
+            *ngIf="errorMessage"
+            class="bg-red-50 border border-red-200 rounded-lg p-4"
+          >
+            <div class="flex items-center">
+              <ion-icon
+                name="alert-circle"
+                class="text-red-500 text-lg mr-2"
+              ></ion-icon>
+              <p class="text-red-700 text-sm font-medium">{{ errorMessage }}</p>
+            </div>
+          </div>
+
+          <!-- Success Message -->
+          <div
+            *ngIf="successMessage"
+            class="bg-green-50 border border-green-200 rounded-lg p-4"
+          >
+            <div class="flex items-center">
+              <ion-icon
+                name="checkmark-circle"
+                class="text-green-500 text-lg mr-2"
+              ></ion-icon>
+              <p class="text-green-700 text-sm font-medium">
+                {{ successMessage }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div
+            class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200"
+          >
+            <button
+              type="button"
+              routerLink="/client-user/documents"
+              class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              [disabled]="uploadForm.invalid || !selectedFile || isUploading"
+              class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed transition-colors font-medium flex items-center"
+            >
+              <span *ngIf="!isUploading">Upload Document</span>
+              <span *ngIf="isUploading" class="flex items-center">
+                <ion-icon
+                  name="refresh-outline"
+                  class="animate-spin mr-2"
+                ></ion-icon>
+                Uploading...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Document Type Info -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Document Types</h3>
+        <div class="space-y-3">
+          <div
+            *ngFor="let docType of docTypeOptions"
+            class="flex items-center p-3 bg-gray-50 rounded-lg"
+          >
+            <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+              <ion-icon
+                [name]="docType.icon"
+                class="text-indigo-600"
+              ></ion-icon>
+            </div>
+            <span class="text-sm font-medium text-gray-700">{{
+              docType.label
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supported Formats -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">
+          Supported Formats
+        </h3>
+        <div class="space-y-2">
+          <div
+            *ngFor="let format of supportedFormats"
+            class="flex items-center text-sm text-gray-600"
+          >
+            <ion-icon
+              name="checkmark-circle"
+              class="text-green-500 mr-2"
+            ></ion-icon>
+            {{ format }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Tips -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Upload Tips</h3>
+        <div class="space-y-3 text-sm text-gray-600">
+          <div class="flex items-start">
+            <ion-icon
+              name="information-circle"
+              class="text-blue-500 mr-2 mt-0.5"
+            ></ion-icon>
+            <span>Ensure documents are clear and readable</span>
+          </div>
+          <div class="flex items-start">
+            <ion-icon
+              name="information-circle"
+              class="text-blue-500 mr-2 mt-0.5"
+            ></ion-icon>
+            <span>Use original files rather than photos of documents</span>
+          </div>
+          <div class="flex items-start">
+            <ion-icon
+              name="information-circle"
+              class="text-blue-500 mr-2 mt-0.5"
+            ></ion-icon>
+            <span>Keep file names descriptive and relevant</span>
+          </div>
+          <div class="flex items-start">
+            <ion-icon
+              name="information-circle"
+              class="text-blue-500 mr-2 mt-0.5"
+            ></ion-icon>
+            <span>Verify document type before uploading</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

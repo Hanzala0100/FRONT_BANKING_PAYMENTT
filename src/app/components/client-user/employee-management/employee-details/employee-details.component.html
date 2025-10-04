@@ -1,1 +1,219 @@
-<p>employee-details works!</p>
+<div class="p-6" *ngIf="!isLoading; else loadingTemplate">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center space-x-4">
+      <a
+        routerLink="/client-user/employees"
+        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          class="text-lg text-gray-600"
+        ></ion-icon>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">
+          {{ employee?.fullName }}
+        </h1>
+        <p class="text-gray-600">Employee Details</p>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <!-- <a
+        [routerLink]="['/client-user/employees', employeeId, 'edit']"
+        class="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="create-outline" class="mr-2"></ion-icon>
+        Edit
+      </a> -->
+      <button
+        (click)="deleteEmployee()"
+        class="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+      >
+        <ion-icon name="trash-outline" class="mr-2"></ion-icon>
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div
+    *ngIf="errorMessage"
+    class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4"
+  >
+    <div class="flex items-center">
+      <ion-icon
+        name="alert-circle"
+        class="text-red-500 text-lg mr-2"
+      ></ion-icon>
+      <p class="text-red-700 text-sm font-medium">{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Employee Information Cards -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6" *ngIf="employee">
+    <!-- Personal Information Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <ion-icon name="person-outline" class="mr-2 text-blue-600"></ion-icon>
+        Personal Information
+      </h2>
+
+      <div class="space-y-4">
+        <div class="flex items-center space-x-4">
+          <div
+            class="h-16 w-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
+          >
+            <span class="text-white text-lg font-semibold">
+              {{ getEmployeeInitials(employee.fullName) }}
+            </span>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">
+              {{ employee.fullName }}
+            </h3>
+            <p class="text-sm text-gray-600">{{ employee.userName }}</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Email:</span>
+            <span class="font-medium text-gray-900">{{ employee.email }}</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-600">Phone:</span>
+            <span class="font-medium text-gray-900">{{
+              employee.phoneNumber
+            }}</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-600">Employee ID:</span>
+            <span class="font-medium text-gray-900"
+              >#{{ employee.clientId }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bank Information Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <ion-icon
+          name="business-outline"
+          class="mr-2 text-green-600"
+        ></ion-icon>
+        Bank Information
+      </h2>
+
+      <div class="space-y-3">
+        <div class="flex justify-between py-2 border-b border-gray-100">
+          <span class="text-gray-600">Account Number:</span>
+          <span class="font-medium text-gray-900">
+            {{ formatAccountNumber(employee.accountNumber) }}
+          </span>
+        </div>
+        <div class="flex justify-between py-2 border-b border-gray-100">
+          <span class="text-gray-600">Bank Name:</span>
+          <span class="font-medium text-gray-900">{{ employee.bankName }}</span>
+        </div>
+        <div class="flex justify-between py-2">
+          <span class="text-gray-600">IFSC Code:</span>
+          <span class="font-medium text-gray-900">{{ employee.ifsccode }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Salary Information Card -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <ion-icon name="cash-outline" class="mr-2 text-orange-600"></ion-icon>
+        Salary Information
+      </h2>
+
+      <div class="text-center py-4">
+        <div class="text-3xl font-bold text-gray-900 mb-2">
+          {{ formatSalary(employee.salaryAmount) }}
+        </div>
+        <p class="text-sm text-gray-600">Monthly Salary</p>
+      </div>
+
+      <div class="mt-4 space-y-2">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Annual Salary:</span>
+          <span class="font-medium text-gray-900">
+            {{ formatSalary(employee.salaryAmount * 12) }}
+          </span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Last Updated:</span>
+          <span class="font-medium text-gray-900">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+    *ngIf="employee"
+  >
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a
+        routerLink="/client-user/salary/disburse"
+        [queryParams]="{ employeeId: employee.clientId }"
+        class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-orange-50 hover:border-orange-200 transition-colors group"
+      >
+        <div
+          class="bg-orange-100 p-2 rounded-lg mr-4 group-hover:bg-orange-200 transition-colors"
+        >
+          <ion-icon
+            name="cash-outline"
+            class="text-orange-600 text-xl"
+          ></ion-icon>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900">Disburse Salary</h3>
+          <p class="text-sm text-gray-600">Process salary payment</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- No Employee Found -->
+  <div
+    *ngIf="!employee && !errorMessage"
+    class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 text-center"
+  >
+    <ion-icon
+      name="person-outline"
+      class="text-6xl text-gray-300 mb-4"
+    ></ion-icon>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">Employee Not Found</h3>
+    <p class="text-gray-500 mb-6">
+      The employee you're looking for doesn't exist or has been removed.
+    </p>
+    <a
+      routerLink="/client-user/employees"
+      class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+    >
+      <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon>
+      Back to Employees
+    </a>
+  </div>
+</div>
+
+<!-- Loading Template -->
+<ng-template #loadingTemplate>
+  <div class="p-6">
+    <div class="text-center py-12">
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+      ></div>
+      <p class="text-gray-500 mt-2">Loading employee details...</p>
+    </div>
+  </div>
+</ng-template>

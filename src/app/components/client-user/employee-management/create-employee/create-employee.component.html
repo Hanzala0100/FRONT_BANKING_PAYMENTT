@@ -1,1 +1,342 @@
-<p>create-employee works!</p>
+<div class="p-6 max-w-2xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4 mb-4">
+      <a
+        routerLink="/client-user/employees"
+        class="flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+      >
+        <ion-icon
+          name="arrow-back-outline"
+          class="text-lg text-gray-600"
+        ></ion-icon>
+      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Add New Employee</h1>
+        <p class="text-gray-600">Create a new employee record</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Personal Information -->
+      <div class="space-y-6">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <ion-icon
+              name="person-outline"
+              class="mr-2 text-blue-600"
+            ></ion-icon>
+            Personal Information
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Enter the employee's personal details
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Full Name -->
+          <div class="md:col-span-2">
+            <label
+              for="fullName"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Full Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              formControlName="fullName"
+              placeholder="Enter employee's full name"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('fullName')"
+            />
+            <div
+              *ngIf="isFieldInvalid('fullName')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Valid full name is required
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div>
+            <label
+              for="username"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Username <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="username"
+              formControlName="username"
+              placeholder="Enter username"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('username')"
+            />
+            <div
+              *ngIf="isFieldInvalid('username')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Username is required (min 3 characters)
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <label
+              for="phoneNumber"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Phone Number <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              formControlName="phoneNumber"
+              placeholder="Enter 10-digit phone number"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('phoneNumber')"
+            />
+            <div
+              *ngIf="isFieldInvalid('phoneNumber')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Valid 10-digit phone number is required
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="md:col-span-2">
+            <label
+              for="email"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Email Address <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="Enter email address"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('email')"
+            />
+            <div
+              *ngIf="isFieldInvalid('email')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Valid email address is required
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Information -->
+      <div class="space-y-6">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+            <ion-icon
+              name="business-outline"
+              class="mr-2 text-green-600"
+            ></ion-icon>
+            Bank Information
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Enter the employee's bank account details for salary disbursement
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Account Number -->
+          <div>
+            <label
+              for="accountNumber"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Account Number <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="accountNumber"
+              formControlName="accountNumber"
+              placeholder="Enter account number"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('accountNumber')"
+            />
+            <div
+              *ngIf="isFieldInvalid('accountNumber')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Valid account number is required
+            </div>
+          </div>
+
+          <!-- Bank Name -->
+          <div>
+            <label
+              for="bankName"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Bank Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="bankName"
+              formControlName="bankName"
+              placeholder="Enter bank name"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('bankName')"
+            />
+            <div
+              *ngIf="isFieldInvalid('bankName')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Bank name is required
+            </div>
+          </div>
+
+          <!-- IFSC Code -->
+          <div>
+            <label
+              for="ifscCode"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              IFSC Code <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="ifscCode"
+              formControlName="ifscCode"
+              placeholder="Enter IFSC code"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors uppercase"
+              [class.border-red-300]="isFieldInvalid('ifscCode')"
+            />
+            <div
+              *ngIf="isFieldInvalid('ifscCode')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Valid IFSC code is required (e.g., SBIN0000123)
+            </div>
+          </div>
+
+          <!-- Salary Amount -->
+          <div>
+            <label
+              for="salaryAmount"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Salary Amount (₹) <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              id="salaryAmount"
+              formControlName="salaryAmount"
+              placeholder="0.00"
+              step="0.01"
+              min="1"
+              class="block w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+              [class.border-red-300]="isFieldInvalid('salaryAmount')"
+            />
+            <div
+              *ngIf="isFieldInvalid('salaryAmount')"
+              class="text-red-600 text-sm mt-1 flex items-center"
+            >
+              <ion-icon
+                name="alert-circle-outline"
+                class="mr-1 text-sm"
+              ></ion-icon>
+              Valid salary amount is required (minimum ₹1)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div
+        *ngIf="errorMessage"
+        class="bg-red-50 border border-red-200 rounded-lg p-4"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="alert-circle"
+            class="text-red-500 text-lg mr-2"
+          ></ion-icon>
+          <p class="text-red-700 text-sm font-medium">{{ errorMessage }}</p>
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div
+        *ngIf="successMessage"
+        class="bg-green-50 border border-green-200 rounded-lg p-4"
+      >
+        <div class="flex items-center">
+          <ion-icon
+            name="checkmark-circle"
+            class="text-green-500 text-lg mr-2"
+          ></ion-icon>
+          <p class="text-green-700 text-sm font-medium">{{ successMessage }}</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div
+        class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200"
+      >
+        <button
+          type="button"
+          routerLink="/client-user/employees"
+          class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="employeeForm.invalid || isLoading"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors font-medium flex items-center"
+        >
+          <span *ngIf="!isLoading">Create Employee</span>
+          <span *ngIf="isLoading" class="flex items-center">
+            <ion-icon
+              name="refresh-outline"
+              class="animate-spin mr-2"
+            ></ion-icon>
+            Creating...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -110,7 +110,7 @@ export class ClientUsersComponent implements OnInit {
     this.userForm.patchValue({
       fullName: user.fullName,
       email: user.email,
-      username: user.username,
+      username: user.userName,
       role: user.role
     });
     // Remove password requirement for editing
@@ -140,7 +140,7 @@ export class ClientUsersComponent implements OnInit {
     const userData: UserCreateRequest = {
       fullName: this.userForm.value.fullName,
       email: this.userForm.value.email,
-      username: this.userForm.value.username,
+      userName: this.userForm.value.username,
       password: this.userForm.value.password,
       role: this.userForm.value.role,
       clientId: this.clientId

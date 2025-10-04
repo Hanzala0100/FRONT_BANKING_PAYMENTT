@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ClientUserService } from '../../../../core/services/client-user.service';
 import { PaymentCreateRequest } from '../../../../shared/models/Payment.inteface';
 import { Beneficiary } from '../../../../shared/models/Beneficiary.interface';
+import { UserStateService } from '../../../../core/services/user-state.service';
 
 @Component({
   selector: 'app-create-payment',
@@ -20,10 +21,13 @@ export class CreatePaymentComponent implements OnInit {
   isSubmitting = false;
   errorMessage = '';
   successMessage = '';
+  currentUser: any;
 
   constructor(
     private fb: FormBuilder,
     private clientUserService: ClientUserService,
+    private userStateService: UserStateService,
+
     private router: Router
   ) {
     this.paymentForm = this.createForm();
@@ -69,7 +73,7 @@ export class CreatePaymentComponent implements OnInit {
     this.successMessage = '';
 
     const paymentData: PaymentCreateRequest = {
-      clientId: 0, // Will be set from current user context
+      clientId: this.currentUser?.clientId,
       beneficiaryId: parseInt(this.paymentForm.value.beneficiaryId),
       amount: parseFloat(this.paymentForm.value.amount),
       paymentDate: this.paymentForm.value.paymentDate

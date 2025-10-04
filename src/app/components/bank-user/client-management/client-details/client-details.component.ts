@@ -73,6 +73,7 @@ export class ClientDetailsComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.documents = response.data.map((doc: any) => ({
+            documentId: doc.documentId ?? 0,
             uploadedBy: doc.uploadedBy ?? '',
             bankId: doc.bankId ?? 0,
             fileName: doc.fileName ?? '',

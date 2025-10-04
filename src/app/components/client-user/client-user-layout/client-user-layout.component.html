@@ -1,13 +1,13 @@
 <div class="flex h-screen bg-gray-50">
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
     [class.translate-x-0]="isSidebarOpen"
     [class.-translate-x-full]="!isSidebarOpen"
   >
     <!-- Sidebar Header -->
     <div
-      class="flex items-center justify-between h-16 px-6 border-b border-gray-200"
+      class="flex items-center justify-between h-16 px-6 border-b border-gray-200 md:hidden"
     >
       <div class="flex items-center space-x-3">
         <div
@@ -40,16 +40,32 @@
             {{ getUserInitials(currentUser?.fullName) }}
           </span>
         </div>
-        <div>
+        <div class="flex-1">
           <p class="text-sm font-semibold text-gray-900">
             {{ currentUser?.fullName }}
           </p>
           <p class="text-xs text-gray-600">{{ currentUser?.email }}</p>
-          <span
-            class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full mt-1"
-          >
-            Client User
-          </span>
+          <div class="flex items-center space-x-2 mt-1">
+            <span
+              class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full"
+            >
+              Client User
+            </span>
+            <span
+              *ngIf="currentClient"
+              class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+              [ngClass]="{
+                'bg-green-100 text-green-800':
+                  currentClient.verificationStatus === 'Verified',
+                'bg-orange-100 text-orange-800':
+                  currentClient.verificationStatus === 'Pending',
+                'bg-red-100 text-red-800':
+                  currentClient.verificationStatus === 'Rejected'
+              }"
+            >
+              {{ getVerificationStatusText() }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -65,7 +81,7 @@
               *ngIf="!item.children; else menuWithChildren"
               [routerLink]="item.route"
               routerLinkActive="bg-green-100 text-green-700 border-green-200"
-              class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-transparent"
+              class="flex items-start px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors border border-transparent"
             >
               <ion-icon [name]="item.icon" class="mr-3 text-lg"></ion-icon>
               <span class="font-medium">{{ item.name }}</span>
@@ -185,14 +201,14 @@
           </div>
 
           <!-- Notifications -->
-          <button
+          <!-- <button
             class="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <ion-icon name="notifications-outline" class="text-xl"></ion-icon>
             <span
               class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"
             ></span>
-          </button>
+          </button> -->
 
           <!-- Client Info -->
           <div

@@ -4,10 +4,11 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { ApiResponse } from "../../shared/models/ApiResponse.interface";
 import { User, UserCreateRequest } from "../../shared/models/User.interface";
-import { Employee, EmployeeCreateRequest } from "../../shared/models/Employee.interface";
+import { Employee, EmployeeCreateRequest, EmployeePaginatedResponse } from "../../shared/models/Employee.interface";
 import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../../shared/models/Salary.interface";
-import { Beneficiary, BeneficiaryCreateRequest } from "../../shared/models/Beneficiary.interface";
+import { Beneficiary, BeneficiaryCreateRequest, BeneficiaryPaginatedData } from "../../shared/models/Beneficiary.interface";
 import { Payment, PaymentCreateRequest } from "../../shared/models/Payment.inteface";
+import { Client } from "../../shared/models/Client.interface";
 
 @Injectable({
   providedIn: 'root',
@@ -53,6 +54,22 @@ export class ClientUserService {
     return this.http.get<ApiResponse<Employee[]>>(`${this.baseUrl}/employees`);
   }
 
+
+  getPaginatedEmployees(pageNumber: number, pageSize: number, clientId?: number, searchTerm?: string, sortDescending?: boolean): Observable<ApiResponse<EmployeePaginatedResponse>> {
+    let params = new HttpParams()
+      .set('PageNumber', pageNumber.toString())
+      .set('PageSize', pageSize.toString());
+    if (clientId) {
+      params = params.set('ClientId', clientId.toString());
+    }
+    if (searchTerm) {
+      params = params.set('SearchTerm', searchTerm);
+    }
+    if (sortDescending !== undefined) {
+      params = params.set('SortDescending', sortDescending.toString());
+    }
+    return this.http.get<ApiResponse<EmployeePaginatedResponse>>(`${this.baseUrl}/paginated-employee`, { params });
+  }
   bulkImportEmployees(csvFile: File): Observable<ApiResponse<BulkEmployeeImportResponse>> {
     const formData = new FormData();
     formData.append('csvFile', csvFile);
@@ -81,6 +98,22 @@ export class ClientUserService {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/beneficiaries/${beneficiaryId}`);
   }
 
+  getPaginatedBeneficiaries(pageNumber: number, pageSize: number, clientId?: number, searchTerm?: string, sortDescending?: boolean): Observable<ApiResponse<BeneficiaryPaginatedData>> {
+    let params = new HttpParams()
+      .set('PageNumber', pageNumber.toString())
+      .set('PageSize', pageSize.toString());
+    if (clientId) {
+      params = params.set('ClientId', clientId.toString());
+    }
+    if (searchTerm) {
+      params = params.set('SearchTerm', searchTerm);
+    }
+    if (sortDescending !== undefined) {
+      params = params.set('SortDescending', sortDescending.toString());
+    }
+    return this.http.get<ApiResponse<BeneficiaryPaginatedData>>(`${this.baseUrl}/paginated-beneficiary`, { params });
+  }
+
   // PAYMENT MANAGEMENT
 
   createPayment(paymentData: PaymentCreateRequest): Observable<ApiResponse<Payment>> {
@@ -98,6 +131,8 @@ export class ClientUserService {
   deletePayment(paymentId: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/payments/${paymentId}`);
   }
+
+
 
   // SALARY DISBURSEMENT
 
@@ -142,4 +177,10 @@ export class ClientUserService {
   deleteDocument(documentId: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/documents/${documentId}`);
   }
+
+
+  getClientById(clientId: number): Observable<ApiResponse<Client>> {
+    return this.http.get<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}`);
+  }
+
 }
