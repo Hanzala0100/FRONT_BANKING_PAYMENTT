@@ -240,7 +240,46 @@
           Showing {{ (currentPage - 1) * pageSize + 1 }} to
           {{ getEndIndex() }} of {{ totalRecords }} entries
         </div>
-        <div class="flex space-x-2"></div>
+        
+        <div class="flex items-center space-x-2">
+          <!-- Previous Button -->
+          <button
+            (click)="onPageChange(currentPage - 1)"
+            [disabled]="!hasPrevious"
+            [class.opacity-50]="!hasPrevious"
+            [class.cursor-not-allowed]="!hasPrevious"
+            class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+
+          <!-- Page Numbers -->
+<!-- Alternative approach with ngClass -->
+<div class="flex space-x-1">
+  <button
+    *ngFor="let page of getPageNumbers()"
+    (click)="onPageChange(page)"
+    [ngClass]="{
+      'bg-blue-600 text-white': page === currentPage,
+      'bg-white text-gray-700': page !== currentPage
+    }"
+    class="px-3 py-1.5 text-sm font-medium border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors min-w-[40px]"
+  >
+    {{ page }}
+  </button>
+</div>
+
+          <!-- Next Button -->
+          <button
+            (click)="onPageChange(currentPage + 1)"
+            [disabled]="!hasNext"
+            [class.opacity-50]="!hasNext"
+            [class.cursor-not-allowed]="!hasNext"
+            class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
 
