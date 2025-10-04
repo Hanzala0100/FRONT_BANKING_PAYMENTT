@@ -40,16 +40,32 @@
             {{ getUserInitials(currentUser?.fullName) }}
           </span>
         </div>
-        <div>
+        <div class="flex-1">
           <p class="text-sm font-semibold text-gray-900">
             {{ currentUser?.fullName }}
           </p>
           <p class="text-xs text-gray-600">{{ currentUser?.email }}</p>
-          <span
-            class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full mt-1"
-          >
-            Client User
-          </span>
+          <div class="flex items-center space-x-2 mt-1">
+            <span
+              class="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full"
+            >
+              Client User
+            </span>
+            <span
+              *ngIf="currentClient"
+              class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+              [ngClass]="{
+                'bg-green-100 text-green-800':
+                  currentClient.verificationStatus === 'Verified',
+                'bg-orange-100 text-orange-800':
+                  currentClient.verificationStatus === 'Pending',
+                'bg-red-100 text-red-800':
+                  currentClient.verificationStatus === 'Rejected'
+              }"
+            >
+              {{ getVerificationStatusText() }}
+            </span>
+          </div>
         </div>
       </div>
     </div>

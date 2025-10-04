@@ -8,6 +8,7 @@ import { Employee, EmployeeCreateRequest, EmployeePaginatedResponse } from "../.
 import { BatchSalaryCreateRequest, BatchSalaryResponse, BulkEmployeeImportResponse, SalaryCreateRequest, SalaryDisbursement } from "../../shared/models/Salary.interface";
 import { Beneficiary, BeneficiaryCreateRequest, BeneficiaryPaginatedData } from "../../shared/models/Beneficiary.interface";
 import { Payment, PaymentCreateRequest } from "../../shared/models/Payment.inteface";
+import { Client } from "../../shared/models/Client.interface";
 
 @Injectable({
   providedIn: 'root',
@@ -176,4 +177,10 @@ export class ClientUserService {
   deleteDocument(documentId: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.baseUrl}/documents/${documentId}`);
   }
+
+
+  getClientById(clientId: number): Observable<ApiResponse<Client>> {
+    return this.http.get<ApiResponse<Client>>(`${this.baseUrl}/clients/${clientId}`);
+  }
+
 }
