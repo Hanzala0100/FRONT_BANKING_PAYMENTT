@@ -2,6 +2,7 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ClientUserService } from '../../../../core/services/client-user.service';
 import { SalaryCreateRequest } from '../../../../shared/models/Salary.interface';
 import { Employee } from '../../../../shared/models/Employee.interface';
@@ -10,7 +11,7 @@ import { UserStateService } from '../../../../core/services/user-state.service';
 @Component({
   selector: 'app-disburse-salary',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './disburse-salary.component.html'
 })
@@ -18,6 +19,7 @@ export class DisburseSalaryComponent implements OnInit {
   salaryForm: FormGroup;
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
+  employeeSearchTerm: string = '';
   isLoading = false;
   isSubmitting = false;
   errorMessage = '';
@@ -85,6 +87,26 @@ export class DisburseSalaryComponent implements OnInit {
     });
   }
 
+  filterEmployees(): void {
+    if (!this.employeeSearchTerm.trim()) {
+      this.filteredEmployees = [...this.employees];
+      return;
+    }
+
+    const searchTerm = this.employeeSearchTerm.toLowerCase().trim();
+    this.filteredEmployees = this.employees.filter(employee =>
+      employee.fullName.toLowerCase().includes(searchTerm) ||
+      employee.email.toLowerCase().includes(searchTerm) ||
+      employee.accountNumber.toString().includes(searchTerm) ||
+      employee.bankName.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  clearSearch(): void {
+    this.employeeSearchTerm = '';
+    this.filterEmployees();
+  }
+
   onEmployeeChange(): void {
     const employeeId = this.salaryForm.get('employeeId')?.value;
     const employee = this.employees.find(emp => emp.employeeId === parseInt(employeeId));
@@ -125,6 +147,7 @@ export class DisburseSalaryComponent implements OnInit {
           this.salaryForm.reset({
             disbursementDate: new Date().toISOString().split('T')[0]
           });
+          this.employeeSearchTerm = '';
           setTimeout(() => {
             this.router.navigate(['/client-user/salary']);
           }, 3000);
