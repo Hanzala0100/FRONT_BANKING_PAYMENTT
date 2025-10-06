@@ -16,7 +16,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
   size = input<'normal' | 'compact'>('normal');
   theme = input<'light' | 'dark'>('light');
   tabindex = input<number>(0);
-  
+
   // Component state
   error: string = '';
   isLoading: boolean = true;
@@ -25,7 +25,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
   // Template reference
   recaptchaContainer = viewChild.required<ElementRef<HTMLDivElement>>('recaptchaContainer');
 
-  constructor(private recaptchaService: RecaptchaService) {}
+  constructor(private recaptchaService: RecaptchaService) { }
 
   async ngOnInit() {
     await this.initializeRecaptcha();
@@ -46,7 +46,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
 
   private renderRecaptchaWidget() {
     const grecaptcha = (window as any).grecaptcha;
-    
+
     if (!grecaptcha) {
       this.handleError('Security service not available');
       return;
@@ -67,7 +67,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
           }
         );
         this.isLoading = false;
-       // console.log('reCAPTCHA v2 widget rendered with ID:', this.widgetId);
+        // console.log('reCAPTCHA v2 widget rendered with ID:', this.widgetId);
       } catch (error) {
         console.error('Error rendering reCAPTCHA widget:', error);
         this.handleError('Failed to initialize security verification');
@@ -76,13 +76,13 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
   }
 
   private onVerify(token: string) {
-    console.log('reCAPTCHA verified with token:', token);
+    // console.log('reCAPTCHA verified with token:', token);
     this.error = '';
     this.verified.emit(token);
   }
 
   private onExpired() {
-    console.log('reCAPTCHA verification expired');
+    // console.log('reCAPTCHA verification expired');
     this.error = 'Security verification expired. Please verify again.';
     this.expired.emit();
   }
@@ -109,9 +109,9 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
 
     try {
       const token = this.recaptchaService.getResponse(this.widgetId);
-      
+
       if (token) {
-        console.log('reCAPTCHA token retrieved:', token);
+        // console.log('reCAPTCHA token retrieved:', token);
         return token;
       } else {
         this.error = 'Please complete the security verification by clicking "I\'m not a robot"';
@@ -131,7 +131,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
     this.error = '';
     if (this.widgetId !== null) {
       this.recaptchaService.reset(this.widgetId);
-      console.log('reCAPTCHA widget reset');
+      // console.log('reCAPTCHA widget reset');
     }
   }
 
@@ -140,7 +140,7 @@ export class RecaptchaComponent implements OnInit, OnDestroy {
    */
   isVerified(): boolean {
     if (this.widgetId === null) return false;
-    
+
     try {
       const token = this.recaptchaService.getResponse(this.widgetId);
       return !!token;
