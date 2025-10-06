@@ -103,10 +103,10 @@ export class BulkImportComponent {
   }
 
   downloadTemplate(): void {
-    const template = `fullName,username,phoneNumber,email,accountNumber,bankName,ifscCode,salaryAmount
+    const template = `FullName,userName,PhoneNumber,Email,AccountNumber,BankName,Ifsccode,SalaryAmount
 John Doe,john.doe,9876543210,john@company.com,12345678901,State Bank of India,SBIN0000123,50000
 Jane Smith,jane.smith,9876543211,jane@company.com,12345678902,HDFC Bank,HDFC0000123,60000`;
-    
+
     const blob = new Blob([template], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

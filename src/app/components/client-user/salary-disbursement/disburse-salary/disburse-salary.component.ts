@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -26,6 +26,7 @@ export class DisburseSalaryComponent implements OnInit {
   successMessage = '';
   currentUser: any;
   selectedEmployeeId: number | null = null;
+  showDropdown = false;
 
   constructor(
     private fb: FormBuilder,
@@ -73,6 +74,7 @@ export class DisburseSalaryComponent implements OnInit {
                 employeeId: employee.employeeId,
                 amount: employee.salaryAmount
               });
+              this.employeeSearchTerm = `${employee.fullName} - ${employee.email}`;
               this.onEmployeeChange();
             }
           }
@@ -90,6 +92,7 @@ export class DisburseSalaryComponent implements OnInit {
   filterEmployees(): void {
     if (!this.employeeSearchTerm.trim()) {
       this.filteredEmployees = [...this.employees];
+      this.showDropdown = true;
       return;
     }
 
@@ -100,11 +103,37 @@ export class DisburseSalaryComponent implements OnInit {
       employee.accountNumber.toString().includes(searchTerm) ||
       employee.bankName.toLowerCase().includes(searchTerm)
     );
+    this.showDropdown = true;
+  }
+
+  onSearchInput(event: any): void {
+    this.showDropdown = true;
+    this.filterEmployees();
+  }
+
+  selectEmployee(employee: Employee): void {
+    this.salaryForm.patchValue({
+      employeeId: employee.employeeId,
+      amount: employee.salaryAmount
+    });
+    this.employeeSearchTerm = `${employee.fullName} - ${employee.email}`;
+    this.showDropdown = false;
+    this.onEmployeeChange();
   }
 
   clearSearch(): void {
     this.employeeSearchTerm = '';
+    this.salaryForm.patchValue({ employeeId: '' });
     this.filterEmployees();
+    this.showDropdown = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.showDropdown = false;
+    }
   }
 
   onEmployeeChange(): void {
